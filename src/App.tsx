@@ -2,12 +2,11 @@ import { useMemo, useState } from 'react'
 
 const TICK_VALUES = {
   ES: 12.5,
+  MES: 1.25,
   NQ: 5,
+  MNQ: 0.5,
   YM: 5,
-  RTY: 5,
-  GC: 10,
-  CL: 10,
-  '6E': 6.25,
+  MYM: 0.5,
 } as const
 
 type AssetKey = keyof typeof TICK_VALUES | 'Custom'
