@@ -33,6 +33,12 @@ type Results = {
   dailyProfitThreshold?: number
 }
 
+type ValueChangeEvent = {
+  target: {
+    value: string
+  }
+}
+
 const formatCurrency = (value: number) =>
   value.toLocaleString('en-US', {
     style: 'currency',
@@ -55,6 +61,7 @@ function App() {
   const [stopTicks, setStopTicks] = useState('12')
   const [errors, setErrors] = useState<Errors>({})
   const [results, setResults] = useState<Results | null>(null)
+  const [isStale, setIsStale] = useState(false)
 
   const tickValue = useMemo(() => {
     if (asset === 'Custom') {
@@ -63,7 +70,17 @@ function App() {
     return TICK_VALUES[asset]
   }, [asset, customTickValue])
 
+  const markInputsChanged = () => {
+    if (results) {
+      setIsStale(true)
+    }
+    if (Object.keys(errors).length > 0) {
+      setErrors({})
+    }
+  }
+
   const handleCalculate = () => {
+    setIsStale(false)
     const nextErrors: Errors = {}
     const maxContractSizeValue = Number(maxContractSize)
     const maxLossValue = Number(maxLoss)
@@ -101,6 +118,7 @@ function App() {
     if (Object.keys(nextErrors).length > 0) {
       setErrors(nextErrors)
       setResults(null)
+      setIsStale(false)
       return
     }
 
@@ -119,6 +137,7 @@ function App() {
           'Daily loss cap is lower than risk per trade. Increase the cap or reduce risk.',
       })
       setResults(null)
+      setIsStale(false)
       return
     }
 
@@ -136,6 +155,7 @@ function App() {
 
     setErrors({})
     setResults(nextResults)
+    setIsStale(false)
   }
 
   const showWarning = results ? results.suggestedContracts < 1 : false
@@ -175,7 +195,10 @@ function App() {
                 type="number"
                 min="1"
                 value={maxContractSize}
-                onChange={(event) => setMaxContractSize(event.target.value)}
+                onChange={(event: ValueChangeEvent) => {
+                  setMaxContractSize(event.target.value)
+                  markInputsChanged()
+                }}
                 className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
               />
               {errors.maxContractSize && (
@@ -193,7 +216,10 @@ function App() {
                 type="number"
                 min="0"
                 value={maxLoss}
-                onChange={(event) => setMaxLoss(event.target.value)}
+                onChange={(event: ValueChangeEvent) => {
+                  setMaxLoss(event.target.value)
+                  markInputsChanged()
+                }}
                 className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
               />
               {errors.maxLoss && (
@@ -210,7 +236,10 @@ function App() {
                 type="number"
                 min="0"
                 value={dailyLossCap}
-                onChange={(event) => setDailyLossCap(event.target.value)}
+                onChange={(event: ValueChangeEvent) => {
+                  setDailyLossCap(event.target.value)
+                  markInputsChanged()
+                }}
                 className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
               />
               {errors.dailyLossCap && (
@@ -228,7 +257,10 @@ function App() {
                 type="number"
                 min="1"
                 value={tradesToBust}
-                onChange={(event) => setTradesToBust(event.target.value)}
+                onChange={(event: ValueChangeEvent) => {
+                  setTradesToBust(event.target.value)
+                  markInputsChanged()
+                }}
                 className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
               />
               {errors.tradesToBust && (
@@ -242,7 +274,10 @@ function App() {
               <label className="text-sm font-medium text-[#9AA4B2]">Asset</label>
               <select
                 value={asset}
-                onChange={(event) => setAsset(event.target.value as AssetKey)}
+                onChange={(event: ValueChangeEvent) => {
+                  setAsset(event.target.value as AssetKey)
+                  markInputsChanged()
+                }}
                 className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
               >
                 {Object.keys(TICK_VALUES).map((key) => (
@@ -263,7 +298,10 @@ function App() {
                   type="number"
                   min="0"
                   value={customTickValue}
-                  onChange={(event) => setCustomTickValue(event.target.value)}
+                  onChange={(event: ValueChangeEvent) => {
+                    setCustomTickValue(event.target.value)
+                    markInputsChanged()
+                  }}
                   className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
                 />
                 {errors.tickValue && (
@@ -282,7 +320,10 @@ function App() {
                 type="number"
                 min="0"
                 value={stopTicks}
-                onChange={(event) => setStopTicks(event.target.value)}
+                onChange={(event: ValueChangeEvent) => {
+                  setStopTicks(event.target.value)
+                  markInputsChanged()
+                }}
                 className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
               />
               {errors.stopTicks && (
@@ -324,7 +365,12 @@ function App() {
           </div>
 
           {results ? (
-            <div className="space-y-4 text-sm">
+            <div className="space-y-4 text-sm" aria-disabled={isStale}>
+              {isStale && (
+                <p className="text-xs text-[#D94A4A]">
+                  Inputs changed — press Calculate.
+                </p>
+              )}
               <div className="rounded-2xl bg-white px-4 py-3">
                 <p className="text-xs uppercase tracking-[0.2em] text-[#9AA4B2]">
                   Risk per trade
