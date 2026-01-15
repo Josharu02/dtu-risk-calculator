@@ -427,7 +427,7 @@ function App() {
               )}
             </div>
           ) : (
-            <div className="rounded-2xl border border-dashed border-[#9AA4B2] bg-white px-4 py-8 text-center text-sm text-[#9AA4B2]">
+            <div className="rounded-2xl border border-dashed border-[#9AA4B2] bg-white px-4 py-8 text-center text-sm text-[#1F6FFF]">
               Enter inputs and press Calculate to see risk outputs.
             </div>
           )}
