@@ -1,0 +1,395 @@
+import { useMemo, useState } from 'react'
+
+const TICK_VALUES = {
+  ES: 12.5,
+  NQ: 5,
+  YM: 5,
+  RTY: 5,
+  GC: 10,
+  CL: 10,
+  '6E': 6.25,
+} as const
+
+type AssetKey = keyof typeof TICK_VALUES | 'Custom'
+
+type Errors = Partial<
+  Record<
+    | 'maxContractSize'
+    | 'maxLoss'
+    | 'dailyLossCap'
+    | 'tradesToBust'
+    | 'stopTicks'
+    | 'tickValue',
+    string
+  >
+>
+
+type Results = {
+  riskPerTrade: number
+  riskPerContract: number
+  suggestedContracts: number
+  riskPerTradeTicks: number
+  maxTradesPerDay?: number
+  dailyProfitThreshold?: number
+}
+
+const formatCurrency = (value: number) =>
+  value.toLocaleString('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 2,
+  })
+
+const formatNumber = (value: number) =>
+  value.toLocaleString('en-US', {
+    maximumFractionDigits: 2,
+  })
+
+function App() {
+  const [maxContractSize, setMaxContractSize] = useState('1')
+  const [maxLoss, setMaxLoss] = useState('2500')
+  const [dailyLossCap, setDailyLossCap] = useState('')
+  const [tradesToBust, setTradesToBust] = useState('10')
+  const [asset, setAsset] = useState<AssetKey>('ES')
+  const [customTickValue, setCustomTickValue] = useState('')
+  const [stopTicks, setStopTicks] = useState('12')
+  const [errors, setErrors] = useState<Errors>({})
+  const [results, setResults] = useState<Results | null>(null)
+
+  const tickValue = useMemo(() => {
+    if (asset === 'Custom') {
+      return Number(customTickValue)
+    }
+    return TICK_VALUES[asset]
+  }, [asset, customTickValue])
+
+  const handleCalculate = () => {
+    const nextErrors: Errors = {}
+    const maxContractSizeValue = Number(maxContractSize)
+    const maxLossValue = Number(maxLoss)
+    const tradesToBustValue = Number(tradesToBust)
+    const stopTicksValue = Number(stopTicks)
+    const dailyLossCapValue =
+      dailyLossCap.trim() === '' ? null : Number(dailyLossCap)
+
+    if (!Number.isFinite(maxContractSizeValue) || maxContractSizeValue < 1) {
+      nextErrors.maxContractSize = 'Enter a whole number of at least 1.'
+    }
+
+    if (!Number.isFinite(maxLossValue) || maxLossValue <= 0) {
+      nextErrors.maxLoss = 'Max loss must be greater than 0.'
+    }
+
+    if (!Number.isFinite(tradesToBustValue) || tradesToBustValue < 1) {
+      nextErrors.tradesToBust = 'Trades until account is lost must be at least 1.'
+    }
+
+    if (!Number.isFinite(stopTicksValue) || stopTicksValue <= 0) {
+      nextErrors.stopTicks = 'Average stop size must be greater than 0.'
+    }
+
+    if (!Number.isFinite(tickValue) || tickValue <= 0) {
+      nextErrors.tickValue = 'Tick value must be greater than 0.'
+    }
+
+    if (dailyLossCapValue !== null) {
+      if (!Number.isFinite(dailyLossCapValue) || dailyLossCapValue <= 0) {
+        nextErrors.dailyLossCap = 'Daily loss cap must be greater than 0.'
+      }
+    }
+
+    if (Object.keys(nextErrors).length > 0) {
+      setErrors(nextErrors)
+      setResults(null)
+      return
+    }
+
+    const riskPerTrade = maxLossValue / tradesToBustValue
+    const riskPerContract = stopTicksValue * tickValue
+    const suggestedContractsRaw = Math.floor(riskPerTrade / riskPerContract)
+    const suggestedContracts = Math.min(
+      suggestedContractsRaw,
+      Math.floor(maxContractSizeValue),
+    )
+    const riskPerTradeTicks = riskPerTrade / tickValue
+
+    if (dailyLossCapValue !== null && riskPerTrade > dailyLossCapValue) {
+      setErrors({
+        dailyLossCap:
+          'Daily loss cap is lower than risk per trade. Increase the cap or reduce risk.',
+      })
+      setResults(null)
+      return
+    }
+
+    const nextResults: Results = {
+      riskPerTrade,
+      riskPerContract,
+      suggestedContracts,
+      riskPerTradeTicks,
+    }
+
+    if (dailyLossCapValue !== null) {
+      nextResults.maxTradesPerDay = Math.floor(dailyLossCapValue / riskPerTrade)
+      nextResults.dailyProfitThreshold = dailyLossCapValue
+    }
+
+    setErrors({})
+    setResults(nextResults)
+  }
+
+  const showWarning = results ? results.suggestedContracts < 1 : false
+
+  return (
+    <div className="min-h-screen px-4 pb-16 pt-6 sm:px-6 lg:px-10">
+      <header className="glass-panel mx-auto flex w-full max-w-6xl flex-col gap-3 rounded-2xl px-6 py-4 text-sm font-medium text-[#9AA4B2] sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+        <span className="tracking-[0.15em] text-[#9AA4B2]">
+          Day Trading University
+        </span>
+        <span className="title-font text-lg text-[#1F6FFF] sm:text-xl">
+          Prop Firm Risk Calculator
+        </span>
+        <span className="inline-flex items-center justify-center rounded-full bg-[#1F6FFF] px-3 py-1 text-xs uppercase tracking-[0.25em] text-white">
+          DTU Tool
+        </span>
+      </header>
+
+      <main className="mx-auto mt-8 grid w-full max-w-6xl grid-cols-1 gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+        <section className="glass-panel rounded-3xl p-6 sm:p-8">
+          <div className="mb-6">
+            <h2 className="title-font text-2xl text-[#1F6FFF] sm:text-3xl">
+              Configure your risk inputs
+            </h2>
+            <p className="mt-2 text-sm text-[#9AA4B2]">
+              Plug in your firm limits, pick the contract, and we will align risk
+              per trade with your stop size.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-[#9AA4B2]">
+                Max Contract Size
+              </label>
+              <input
+                type="number"
+                min="1"
+                value={maxContractSize}
+                onChange={(event) => setMaxContractSize(event.target.value)}
+                className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
+              />
+              {errors.maxContractSize && (
+                <p className="text-xs text-[#D94A4A]">
+                  {errors.maxContractSize}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-[#9AA4B2]">
+                Max Loss ($)
+              </label>
+              <input
+                type="number"
+                min="0"
+                value={maxLoss}
+                onChange={(event) => setMaxLoss(event.target.value)}
+                className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
+              />
+              {errors.maxLoss && (
+                <p className="text-xs text-[#D94A4A]">{errors.maxLoss}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-[#9AA4B2]">
+                Daily Loss Cap ($)
+                <span className="ml-2 text-xs text-[#9AA4B2]">(optional)</span>
+              </label>
+              <input
+                type="number"
+                min="0"
+                value={dailyLossCap}
+                onChange={(event) => setDailyLossCap(event.target.value)}
+                className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
+              />
+              {errors.dailyLossCap && (
+                <p className="text-xs text-[#D94A4A]">
+                  {errors.dailyLossCap}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-[#9AA4B2]">
+                Trades until account is lost
+              </label>
+              <input
+                type="number"
+                min="1"
+                value={tradesToBust}
+                onChange={(event) => setTradesToBust(event.target.value)}
+                className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
+              />
+              {errors.tradesToBust && (
+                <p className="text-xs text-[#D94A4A]">
+                  {errors.tradesToBust}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-[#9AA4B2]">Asset</label>
+              <select
+                value={asset}
+                onChange={(event) => setAsset(event.target.value as AssetKey)}
+                className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
+              >
+                {Object.keys(TICK_VALUES).map((key) => (
+                  <option key={key} value={key}>
+                    {key}
+                  </option>
+                ))}
+                <option value="Custom">Custom</option>
+              </select>
+            </div>
+
+            {asset === 'Custom' && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-[#9AA4B2]">
+                  Tick Value ($/tick)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  value={customTickValue}
+                  onChange={(event) => setCustomTickValue(event.target.value)}
+                  className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
+                />
+                {errors.tickValue && (
+                  <p className="text-xs text-[#D94A4A]">
+                    {errors.tickValue}
+                  </p>
+                )}
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-[#9AA4B2]">
+                Average Stop Size (ticks)
+              </label>
+              <input
+                type="number"
+                min="0"
+                value={stopTicks}
+                onChange={(event) => setStopTicks(event.target.value)}
+                className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
+              />
+              {errors.stopTicks && (
+                <p className="text-xs text-[#D94A4A]">{errors.stopTicks}</p>
+              )}
+            </div>
+
+            {asset !== 'Custom' && (
+              <div className="rounded-2xl border border-dashed border-[#9AA4B2] bg-white px-4 py-3 text-sm text-[#9AA4B2]">
+                Tick Value:{' '}
+                <span className="font-semibold text-[#1F6FFF]">
+                  {tickValue}
+                </span>{' '}
+                $/tick
+              </div>
+            )}
+          </div>
+
+          {errors.tickValue && asset !== 'Custom' && (
+            <p className="mt-3 text-xs text-[#D94A4A]">{errors.tickValue}</p>
+          )}
+
+          <button
+            onClick={handleCalculate}
+            className="mt-8 inline-flex items-center justify-center rounded-full bg-[#1F6FFF] px-8 py-3 text-sm font-semibold uppercase tracking-[0.25em] text-white shadow-lg shadow-[0_20px_60px_rgba(31,111,255,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_70px_rgba(31,111,255,0.45)]"
+          >
+            Calculate
+          </button>
+        </section>
+
+        <section className="glass-panel rounded-3xl p-6 sm:p-8">
+          <div className="mb-6">
+            <h2 className="title-font text-2xl text-[#1F6FFF] sm:text-3xl">
+              Risk outputs
+            </h2>
+            <p className="mt-2 text-sm text-[#9AA4B2]">
+              Use these numbers to keep each trade aligned with your firm limits.
+            </p>
+          </div>
+
+          {results ? (
+            <div className="space-y-4 text-sm">
+              <div className="rounded-2xl bg-white px-4 py-3">
+                <p className="text-xs uppercase tracking-[0.2em] text-[#9AA4B2]">
+                  Risk per trade
+                </p>
+                <p className="mt-1 text-2xl font-semibold text-[#1F6FFF]">
+                  {formatCurrency(results.riskPerTrade)}
+                </p>
+                <p className="mt-1 text-xs text-[#9AA4B2]">
+                  {formatNumber(results.riskPerTradeTicks)} ticks per trade
+                </p>
+              </div>
+
+              <div className="rounded-2xl bg-white px-4 py-3">
+                <p className="text-xs uppercase tracking-[0.2em] text-[#9AA4B2]">
+                  Risk per contract
+                </p>
+                <p className="mt-1 text-xl font-semibold text-[#1F6FFF]">
+                  {formatCurrency(results.riskPerContract)}
+                </p>
+              </div>
+
+              <div className="rounded-2xl bg-white px-4 py-3">
+                <p className="text-xs uppercase tracking-[0.2em] text-[#9AA4B2]">
+                  Suggested contracts
+                </p>
+                <p className="mt-1 text-3xl font-semibold text-[#1F6FFF]">
+                  {results.suggestedContracts}
+                </p>
+                {showWarning && (
+                  <p className="mt-2 text-xs font-semibold text-[#D94A4A]">
+                    Suggested contracts is below 1. Increase max loss or reduce
+                    stop size.
+                  </p>
+                )}
+              </div>
+
+              {results.maxTradesPerDay !== undefined && (
+                <div className="rounded-2xl bg-white px-4 py-3">
+                  <p className="text-xs uppercase tracking-[0.2em] text-[#9AA4B2]">
+                    Daily loss cap insight
+                  </p>
+                  <p className="mt-1 text-sm font-semibold text-[#1F6FFF]">
+                    Max trades per day:{' '}
+                    <span className="text-[#2ECC71]">
+                      {results.maxTradesPerDay}
+                    </span>
+                  </p>
+                  <p className="mt-1 text-sm text-[#9AA4B2]">
+                    Daily profit threshold:{' '}
+                    <span className="font-semibold text-[#2ECC71]">
+                      {formatCurrency(results.dailyProfitThreshold ?? 0)}
+                    </span>
+                  </p>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-dashed border-[#9AA4B2] bg-white px-4 py-8 text-center text-sm text-[#9AA4B2]">
+              Enter inputs and press Calculate to see risk outputs.
+            </div>
+          )}
+        </section>
+      </main>
+    </div>
+  )
+}
+
+export default App
