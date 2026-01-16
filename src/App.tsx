@@ -191,7 +191,7 @@ function App() {
     if (riskPerTrade > dailyLossCapValue) {
       setErrors({
         dailyLossCap:
-          'Daily loss cap is lower than risk per trade. Increase the cap or reduce risk.',
+          'This is too much risk based on your Daily Loss Limit. You can either raise the DLL or increase the amount of trades taken until account is lost.',
       })
       setResults(null)
       setIsStale(false)
