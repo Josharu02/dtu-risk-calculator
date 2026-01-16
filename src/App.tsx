@@ -224,6 +224,7 @@ function App() {
     Number.isFinite(profitTargetValue) &&
     profitTargetValue > 0
   const maxDailyProfit = profitTargetValue * (consistencyRuleValue / 100)
+  const dailyLossLimitValue = Number(dailyLossCap)
 
   return (
     <div className="min-h-screen px-4 pb-16 pt-6 sm:px-6 lg:px-10">
@@ -567,6 +568,22 @@ function App() {
                   </p>
                 </div>
               )}
+
+              <div className="rounded-2xl bg-white px-4 py-3">
+                <p className="text-xs uppercase tracking-[0.2em] text-[#9AA4B2]">
+                  Risk management
+                </p>
+                <p className="mt-2 text-sm text-[#9AA4B2]">
+                  Since you trade {asset} and you normally use a {stopTicks}{' '}
+                  tick stop loss, you should be using{' '}
+                  {results.suggestedContracts} contracts. This means you’d be
+                  risking {formatCurrency(results.riskPerTrade)} per trade. With
+                  a Daily Loss Limit of {formatCurrency(dailyLossLimitValue)},
+                  you could take{' '}
+                  {Math.floor(dailyLossLimitValue / results.riskPerTrade)} full
+                  stop loss hits before stopping for the day.
+                </p>
+              </div>
             </div>
           ) : (
             <div className="rounded-2xl border border-dashed border-[#9AA4B2] bg-white px-4 py-8 text-center text-sm text-[#1F6FFF]">
