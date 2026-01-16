@@ -584,6 +584,31 @@ function App() {
                   stop loss hits before stopping for the day.
                 </p>
               </div>
+
+              {(!applyConsistencyRule || showMaxDailyProfit) && (
+                <div className="rounded-2xl bg-white px-4 py-3">
+                  <p className="text-xs uppercase tracking-[0.2em] text-[#9AA4B2]">
+                    Profit goals
+                  </p>
+                  {!applyConsistencyRule && (
+                    <p className="mt-2 text-sm text-[#9AA4B2]">
+                      Your daily profit target is{' '}
+                      {formatCurrency(results.dailyProfitThreshold ?? 0)} and
+                      you don’t have a consistency rule, so anything above that
+                      is just extra!
+                    </p>
+                  )}
+                  {showMaxDailyProfit && (
+                    <p className="mt-2 text-sm text-[#9AA4B2]">
+                      Your daily profit target is{' '}
+                      {formatCurrency(results.dailyProfitThreshold ?? 0)} and
+                      since you have a consistency rule, make sure you don’t
+                      make any more than {formatCurrency(maxDailyProfit)} in a
+                      single trading day.
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           ) : (
             <div className="rounded-2xl border border-dashed border-[#9AA4B2] bg-white px-4 py-8 text-center text-sm text-[#1F6FFF]">
