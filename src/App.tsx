@@ -214,6 +214,16 @@ function App() {
   }
 
   const showWarning = results ? results.suggestedContracts < 1 : false
+  const profitTargetValue = Number(profitTarget)
+  const consistencyRuleValue = Number(consistencyRule)
+  const showMaxDailyProfit =
+    applyConsistencyRule &&
+    consistencyRule.trim() !== '' &&
+    Number.isFinite(consistencyRuleValue) &&
+    consistencyRuleValue > 0 &&
+    Number.isFinite(profitTargetValue) &&
+    profitTargetValue > 0
+  const maxDailyProfit = profitTargetValue * (consistencyRuleValue / 100)
 
   return (
     <div className="min-h-screen px-4 pb-16 pt-6 sm:px-6 lg:px-10">
@@ -502,6 +512,26 @@ function App() {
                   {formatCurrency(results.riskPerContract)}
                 </p>
               </div>
+
+              <div className="rounded-2xl bg-white px-4 py-3">
+                <p className="text-xs uppercase tracking-[0.2em] text-[#9AA4B2]">
+                  Daily Profit Target
+                </p>
+                <p className="mt-1 text-xl font-semibold text-[#1F6FFF]">
+                  {formatCurrency(results.dailyProfitThreshold ?? 0)}
+                </p>
+              </div>
+
+              {showMaxDailyProfit && (
+                <div className="rounded-2xl bg-white px-4 py-3">
+                  <p className="text-xs uppercase tracking-[0.2em] text-[#9AA4B2]">
+                    MAX Daily Profit
+                  </p>
+                  <p className="mt-1 text-xl font-semibold text-[#1F6FFF]">
+                    {formatCurrency(maxDailyProfit)}
+                  </p>
+                </div>
+              )}
 
               <div className="rounded-2xl bg-white px-4 py-3">
                 <p className="text-xs uppercase tracking-[0.2em] text-[#9AA4B2]">
