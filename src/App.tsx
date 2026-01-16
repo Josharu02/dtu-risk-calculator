@@ -5,8 +5,53 @@ const TICK_VALUES = {
   MES: 1.25,
   NQ: 5,
   MNQ: 0.5,
+  RTY: 5,
+  M2K: 0.5,
+  NKD: 25,
+  MBT: 0.5,
+  MET: 0.25,
+  '6A': 10,
+  '6B': 6.25,
+  '6C': 10,
+  '6E': 6.25,
+  '6J': 6.25,
+  '6S': 12.5,
+  E7: 6.25,
+  M6E: 1.25,
+  M6A: 1,
+  '6M': 5,
+  '6N': 10,
+  M6B: 0.625,
+  HE: 10,
+  LE: 10,
+  CL: 10,
+  QM: 12.5,
+  NG: 10,
+  QG: 12.5,
+  MCL: 1,
+  RB: 4.2,
+  HO: 4.2,
+  PL: 5,
+  MNG: 2.5,
+  ZC: 12.5,
+  ZW: 12.5,
+  ZS: 12.5,
+  ZM: 10,
+  ZL: 6,
   YM: 5,
   MYM: 0.5,
+  ZT: 15.625,
+  ZF: 7.8125,
+  ZN: 15.625,
+  TN: 15.625,
+  ZB: 31.25,
+  UB: 31.25,
+  GC: 10,
+  SI: 25,
+  HG: 12.5,
+  MGC: 1,
+  SIL: 5,
+  MHG: 1.25,
 } as const
 
 type AssetKey = keyof typeof TICK_VALUES | 'Custom'
@@ -15,6 +60,7 @@ type Errors = Partial<
   Record<
     | 'maxContractSize'
     | 'maxLoss'
+    | 'profitTarget'
     | 'dailyLossCap'
     | 'tradesToBust'
     | 'stopTicks'
@@ -54,10 +100,13 @@ function App() {
   const [maxContractSize, setMaxContractSize] = useState('1')
   const [maxLoss, setMaxLoss] = useState('2500')
   const [dailyLossCap, setDailyLossCap] = useState('')
+  const [profitTarget, setProfitTarget] = useState('')
   const [tradesToBust, setTradesToBust] = useState('10')
   const [asset, setAsset] = useState<AssetKey>('ES')
   const [customTickValue, setCustomTickValue] = useState('')
   const [stopTicks, setStopTicks] = useState('12')
+  const [applyConsistencyRule, setApplyConsistencyRule] = useState(false)
+  const [consistencyRule, setConsistencyRule] = useState('')
   const [errors, setErrors] = useState<Errors>({})
   const [results, setResults] = useState<Results | null>(null)
   const [isStale, setIsStale] = useState(false)
@@ -83,10 +132,16 @@ function App() {
     const nextErrors: Errors = {}
     const maxContractSizeValue = Number(maxContractSize)
     const maxLossValue = Number(maxLoss)
+    const profitTargetValue = Number(profitTarget)
     const tradesToBustValue = Number(tradesToBust)
     const stopTicksValue = Number(stopTicks)
-    const dailyLossCapValue =
-      dailyLossCap.trim() === '' ? null : Number(dailyLossCap)
+    const dailyLossCapValue = Number(dailyLossCap)
+
+    if (profitTarget.trim() === '') {
+      nextErrors.profitTarget = 'Profit Target is required.'
+    } else if (!Number.isFinite(profitTargetValue) || profitTargetValue <= 0) {
+      nextErrors.profitTarget = 'Profit Target must be greater than 0.'
+    }
 
     if (!Number.isFinite(maxContractSizeValue) || maxContractSizeValue < 1) {
       nextErrors.maxContractSize = 'Enter a whole number of at least 1.'
@@ -96,22 +151,25 @@ function App() {
       nextErrors.maxLoss = 'Max loss must be greater than 0.'
     }
 
-    if (!Number.isFinite(tradesToBustValue) || tradesToBustValue < 1) {
+    if (tradesToBust.trim() === '') {
+      nextErrors.tradesToBust = 'Trades until account is lost is required.'
+    } else if (!Number.isFinite(tradesToBustValue) || tradesToBustValue < 1) {
       nextErrors.tradesToBust = 'Trades until account is lost must be at least 1.'
     }
 
     if (!Number.isFinite(stopTicksValue) || stopTicksValue <= 0) {
-      nextErrors.stopTicks = 'Average stop size must be greater than 0.'
+      nextErrors.stopTicks = 'Stop loss size must be greater than 0.'
     }
 
     if (!Number.isFinite(tickValue) || tickValue <= 0) {
       nextErrors.tickValue = 'Tick value must be greater than 0.'
     }
 
-    if (dailyLossCapValue !== null) {
-      if (!Number.isFinite(dailyLossCapValue) || dailyLossCapValue <= 0) {
-        nextErrors.dailyLossCap = 'Daily loss cap must be greater than 0.'
-      }
+    if (dailyLossCap.trim() === '') {
+      nextErrors.dailyLossCap =
+        "Even if the prop firm doesn't have a Daily Loss Limit, you should still have one as part of your trading plan."
+    } else if (!Number.isFinite(dailyLossCapValue) || dailyLossCapValue <= 0) {
+      nextErrors.dailyLossCap = 'Daily loss limit must be greater than 0.'
     }
 
     if (Object.keys(nextErrors).length > 0) {
@@ -130,7 +188,7 @@ function App() {
     )
     const riskPerTradeTicks = riskPerTrade / tickValue
 
-    if (dailyLossCapValue !== null && riskPerTrade > dailyLossCapValue) {
+    if (riskPerTrade > dailyLossCapValue) {
       setErrors({
         dailyLossCap:
           'Daily loss cap is lower than risk per trade. Increase the cap or reduce risk.',
@@ -147,10 +205,8 @@ function App() {
       riskPerTradeTicks,
     }
 
-    if (dailyLossCapValue !== null) {
-      nextResults.maxTradesPerDay = Math.floor(dailyLossCapValue / riskPerTrade)
-      nextResults.dailyProfitThreshold = dailyLossCapValue
-    }
+    nextResults.maxTradesPerDay = Math.floor(dailyLossCapValue / riskPerTrade)
+    nextResults.dailyProfitThreshold = dailyLossCapValue
 
     setErrors({})
     setResults(nextResults)
@@ -188,6 +244,46 @@ function App() {
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
             <div className="space-y-2">
               <label className="text-sm font-medium text-[#9AA4B2]">
+                Profit Target ($)
+              </label>
+              <input
+                type="number"
+                min="0"
+                value={profitTarget}
+                onChange={(event: ValueChangeEvent) => {
+                  setProfitTarget(event.target.value)
+                  markInputsChanged()
+                }}
+                className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
+              />
+              {errors.profitTarget && (
+                <p className="text-xs text-[#D94A4A]">
+                  {errors.profitTarget}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-[#9AA4B2]">
+                Max Loss Limit ($)
+              </label>
+              <input
+                type="number"
+                min="0"
+                value={maxLoss}
+                onChange={(event: ValueChangeEvent) => {
+                  setMaxLoss(event.target.value)
+                  markInputsChanged()
+                }}
+                className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
+              />
+              {errors.maxLoss && (
+                <p className="text-xs text-[#D94A4A]">{errors.maxLoss}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-[#9AA4B2]">
                 Max Contract Size
               </label>
               <input
@@ -209,27 +305,7 @@ function App() {
 
             <div className="space-y-2">
               <label className="text-sm font-medium text-[#9AA4B2]">
-                Max Loss ($)
-              </label>
-              <input
-                type="number"
-                min="0"
-                value={maxLoss}
-                onChange={(event: ValueChangeEvent) => {
-                  setMaxLoss(event.target.value)
-                  markInputsChanged()
-                }}
-                className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
-              />
-              {errors.maxLoss && (
-                <p className="text-xs text-[#D94A4A]">{errors.maxLoss}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-[#9AA4B2]">
-                Daily Loss Cap ($)
-                <span className="ml-2 text-xs text-[#9AA4B2]">(optional)</span>
+                Daily Loss Limit ($)
               </label>
               <input
                 type="number"
@@ -270,7 +346,43 @@ function App() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-[#9AA4B2]">Asset</label>
+              <label className="text-sm font-medium text-[#9AA4B2]">
+                Consistency Rule
+              </label>
+              <label className="flex items-center gap-2 text-sm text-[#9AA4B2]">
+                <input
+                  type="checkbox"
+                  checked={applyConsistencyRule}
+                  onChange={(event) => {
+                    const nextValue = event.target.checked
+                    setApplyConsistencyRule(nextValue)
+                    if (!nextValue) {
+                      setConsistencyRule('')
+                    }
+                    markInputsChanged()
+                  }}
+                  className="h-4 w-4 rounded border border-[#9AA4B2] text-[#1F6FFF] focus:ring-2 focus:ring-[#1F6FFF]/20"
+                />
+                Apply Consistency Rule
+              </label>
+              {applyConsistencyRule && (
+                <input
+                  type="number"
+                  min="0"
+                  value={consistencyRule}
+                  onChange={(event: ValueChangeEvent) => {
+                    setConsistencyRule(event.target.value)
+                    markInputsChanged()
+                  }}
+                  className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
+                />
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-[#9AA4B2]">
+                What do you trade?
+              </label>
               <select
                 value={asset}
                 onChange={(event: ValueChangeEvent) => {
@@ -284,7 +396,7 @@ function App() {
                     {key}
                   </option>
                 ))}
-                <option value="Custom">Custom</option>
+                <option value="Custom">Custom ($/tick)</option>
               </select>
             </div>
 
@@ -313,7 +425,7 @@ function App() {
 
             <div className="space-y-2">
               <label className="text-sm font-medium text-[#9AA4B2]">
-                Average Stop Size (ticks)
+                What size stop loss do you use? (in ticks)
               </label>
               <input
                 type="number"
@@ -367,7 +479,7 @@ function App() {
             <div className="space-y-4 text-sm" aria-disabled={isStale}>
               {isStale && (
                 <p className="text-xs text-[#D94A4A]">
-                  Inputs changed — press Calculate.
+                  Inputs changed - press Calculate.
                 </p>
               )}
               <div className="rounded-2xl bg-white px-4 py-3">
