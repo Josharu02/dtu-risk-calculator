@@ -453,15 +453,6 @@ function App() {
               )}
             </div>
 
-            {asset !== 'Custom' && (
-              <div className="rounded-2xl border border-dashed border-[#9AA4B2] bg-white px-4 py-3 text-sm text-[#9AA4B2]">
-                Tick Value:{' '}
-                <span className="font-semibold text-[#1F6FFF]">
-                  {tickValue}
-                </span>{' '}
-                $/tick
-              </div>
-            )}
           </div>
 
           {errors.tickValue && asset !== 'Custom' && (
