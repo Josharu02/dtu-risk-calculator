@@ -213,7 +213,6 @@ function App() {
     setIsStale(false)
   }
 
-  const showWarning = results ? results.suggestedContracts < 1 : false
   const profitTargetValue = Number(profitTarget)
   const consistencyRuleValue = Number(consistencyRule)
   const showMaxDailyProfit =
@@ -486,90 +485,14 @@ function App() {
               )}
               <div className="rounded-2xl bg-white px-4 py-3">
                 <p className="text-xs uppercase tracking-[0.2em] text-[#9AA4B2]">
-                  Risk per trade
-                </p>
-                <p className="mt-1 text-2xl font-semibold text-[#1F6FFF]">
-                  {formatCurrency(results.riskPerTrade)}
-                </p>
-                <p className="mt-1 text-xs text-[#9AA4B2]">
-                  {formatNumber(results.riskPerTradeTicks)} ticks per trade
-                </p>
-              </div>
-
-              <div className="rounded-2xl bg-white px-4 py-3">
-                <p className="text-xs uppercase tracking-[0.2em] text-[#9AA4B2]">
-                  Risk per contract
-                </p>
-                <p className="mt-1 text-xl font-semibold text-[#1F6FFF]">
-                  {formatCurrency(results.riskPerContract)}
-                </p>
-              </div>
-
-              <div className="rounded-2xl bg-white px-4 py-3">
-                <p className="text-xs uppercase tracking-[0.2em] text-[#9AA4B2]">
-                  Daily Profit Target
-                </p>
-                <p className="mt-1 text-xl font-semibold text-[#1F6FFF]">
-                  {formatCurrency(results.dailyProfitThreshold ?? 0)}
-                </p>
-              </div>
-
-              {showMaxDailyProfit && (
-                <div className="rounded-2xl bg-white px-4 py-3">
-                  <p className="text-xs uppercase tracking-[0.2em] text-[#9AA4B2]">
-                    MAX Daily Profit
-                  </p>
-                  <p className="mt-1 text-xl font-semibold text-[#1F6FFF]">
-                    {formatCurrency(maxDailyProfit)}
-                  </p>
-                </div>
-              )}
-
-              <div className="rounded-2xl bg-white px-4 py-3">
-                <p className="text-xs uppercase tracking-[0.2em] text-[#9AA4B2]">
-                  Suggested contracts
-                </p>
-                <p className="mt-1 text-3xl font-semibold text-[#1F6FFF]">
-                  {results.suggestedContracts}
-                </p>
-                {showWarning && (
-                  <p className="mt-2 text-xs font-semibold text-[#D94A4A]">
-                    Suggested contracts is below 1. Increase max loss or reduce
-                    stop size.
-                  </p>
-                )}
-              </div>
-
-              {results.maxTradesPerDay !== undefined && (
-                <div className="rounded-2xl bg-white px-4 py-3">
-                  <p className="text-xs uppercase tracking-[0.2em] text-[#9AA4B2]">
-                    Daily loss cap insight
-                  </p>
-                  <p className="mt-1 text-sm font-semibold text-[#1F6FFF]">
-                    Max trades per day:{' '}
-                    <span className="text-[#2ECC71]">
-                      {results.maxTradesPerDay}
-                    </span>
-                  </p>
-                  <p className="mt-1 text-sm text-[#9AA4B2]">
-                    Daily profit threshold:{' '}
-                    <span className="font-semibold text-[#2ECC71]">
-                      {formatCurrency(results.dailyProfitThreshold ?? 0)}
-                    </span>
-                  </p>
-                </div>
-              )}
-
-              <div className="rounded-2xl bg-white px-4 py-3">
-                <p className="text-xs uppercase tracking-[0.2em] text-[#9AA4B2]">
                   Risk management
                 </p>
                 <p className="mt-2 text-sm text-[#9AA4B2]">
-                  Since you trade {asset} and you normally use a {stopTicks}{' '}
+                  Since you trade <span className="font-semibold text-[#1F6FFF]">{asset}</span> and you normally use a <span className="font-semibold text-[#1F6FFF]">{stopTicks}</span>{' '}
                   tick stop loss, you should be using{' '}
-                  {results.suggestedContracts} contracts. This means you’d be
+                  <span className="font-semibold text-[#1F6FFF]">{results.suggestedContracts}</span> contracts. This means you’d be
                   risking {formatCurrency(results.riskPerTrade)} per trade. With
-                  a Daily Loss Limit of {formatCurrency(dailyLossLimitValue)},
+                  a Daily Loss Limit of <span className="font-semibold text-[#D94A4A]">{formatCurrency(dailyLossLimitValue)}</span>,
                   you could take{' '}
                   {Math.floor(dailyLossLimitValue / results.riskPerTrade)} full
                   stop loss hits before stopping for the day.
@@ -584,7 +507,7 @@ function App() {
                   {!applyConsistencyRule && (
                     <p className="mt-2 text-sm text-[#9AA4B2]">
                       Your daily profit target is{' '}
-                      {formatCurrency(results.dailyProfitThreshold ?? 0)} and
+                      <span className="font-semibold text-[#2ECC71]">{formatCurrency(results.dailyProfitThreshold ?? 0)}</span> and
                       you don’t have a consistency rule, so anything above that
                       is just extra!
                     </p>
@@ -592,9 +515,9 @@ function App() {
                   {showMaxDailyProfit && (
                     <p className="mt-2 text-sm text-[#9AA4B2]">
                       Your daily profit target is{' '}
-                      {formatCurrency(results.dailyProfitThreshold ?? 0)} and
+                      <span className="font-semibold text-[#2ECC71]">{formatCurrency(results.dailyProfitThreshold ?? 0)}</span> and
                       since you have a consistency rule, make sure you don’t
-                      make any more than {formatCurrency(maxDailyProfit)} in a
+                      make any more than <span className="font-semibold text-[#2ECC71]">{formatCurrency(maxDailyProfit)}</span> in a
                       single trading day.
                     </p>
                   )}
