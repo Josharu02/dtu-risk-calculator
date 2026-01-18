@@ -91,11 +91,6 @@ const formatCurrency = (value: number) =>
     maximumFractionDigits: 2,
   })
 
-const formatNumber = (value: number) =>
-  value.toLocaleString('en-US', {
-    maximumFractionDigits: 2,
-  })
-
 function App() {
   const [maxContractSize, setMaxContractSize] = useState('1')
   const [maxLoss, setMaxLoss] = useState('2500')
