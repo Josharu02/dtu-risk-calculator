@@ -746,6 +746,7 @@ function App() {
               title="GHL Submit"
               name="ghl_target"
               className="hidden"
+              sandbox="allow-forms allow-same-origin"
             />
             <form
               ref={emailFormRef}
