@@ -379,6 +379,8 @@ function App() {
     }
   }
 
+  const toFormValue = (value: unknown) => String(value ?? '')
+
   const profitTargetValue = Number(profitTarget)
   const consistencyRuleValue = Number(consistencyRule)
   const showMaxDailyProfit =
@@ -752,75 +754,89 @@ function App() {
               target="ghl_target"
               className="hidden"
             >
-              <input type="hidden" name="full_name" value={fullName.trim()} />
-              <input type="hidden" name="email" value={email.trim()} />
+              <input
+                type="hidden"
+                name="full_name"
+                value={toFormValue(fullName.trim())}
+              />
+              <input
+                type="hidden"
+                name="email"
+                value={toFormValue(email.trim())}
+              />
               <input
                 type="hidden"
                 name="profit_target"
-                value={String(Number(profitTarget))}
+                value={toFormValue(Number(profitTarget))}
               />
               <input
                 type="hidden"
                 name="max_loss_limit"
-                value={String(Number(maxLoss))}
+                value={toFormValue(Number(maxLoss))}
               />
               <input
                 type="hidden"
                 name="max_contract_size"
-                value={String(Number(maxContractSize))}
+                value={toFormValue(Number(maxContractSize))}
               />
               <input
                 type="hidden"
                 name="daily_loss_limit"
-                value={String(Number(dailyLossCap))}
+                value={toFormValue(Number(dailyLossCap))}
               />
               <input
                 type="hidden"
                 name="trades_until_lost"
-                value={String(Number(tradesToBust))}
+                value={toFormValue(Number(tradesToBust))}
               />
               <input
                 type="hidden"
                 name="consistency_enabled"
-                value={applyConsistencyRule ? 'true' : 'false'}
+                value={toFormValue(applyConsistencyRule ? 'true' : 'false')}
               />
               <input
                 type="hidden"
                 name="consistency_rule"
-                value={applyConsistencyRule ? consistencyRule.trim() : ''}
+                value={toFormValue(
+                  applyConsistencyRule ? consistencyRule.trim() : '',
+                )}
               />
-              <input type="hidden" name="product" value={asset} />
+              <input
+                type="hidden"
+                name="product"
+                value={toFormValue(asset)}
+              />
               <input
                 type="hidden"
                 name="stop_loss_ticks"
-                value={String(Number(stopTicks))}
+                value={toFormValue(Number(stopTicks))}
               />
               <input
                 type="hidden"
                 name="suggested_contracts"
-                value={String(results.suggestedContracts)}
+                value={toFormValue(results.suggestedContracts)}
               />
               <input
                 type="hidden"
                 name="risk_per_trade"
-                value={String(results.riskPerTrade)}
+                value={toFormValue(results.riskPerTrade)}
               />
               <input
                 type="hidden"
                 name="max_sl_hits_per_day"
-                value={String(
+                value={toFormValue(
                   Math.floor(Number(dailyLossCap) / results.riskPerTrade),
                 )}
               />
               <input
                 type="hidden"
                 name="daily_profit_target"
-                value={String(results.dailyProfitThreshold ?? 0)}
+                value={toFormValue(results.dailyProfitThreshold ?? 0)}
               />
               <input
                 type="hidden"
                 name="max_daily_profit"
-                value={applyConsistencyRule ? String(maxDailyProfit) : '0'}
+                value={toFormValue(applyConsistencyRule ? maxDailyProfit : 0)}
               />
             </form>
           </>
