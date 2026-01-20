@@ -174,7 +174,7 @@ function App() {
       return
     }
 
-    const riskPerTrade = maxLossValue / tradesToBustValue
+    const riskPerTrade = profitTargetValue / tradesToBustValue
     const riskPerContract = stopTicksValue * tickValue
     const suggestedContractsRaw = Math.floor(riskPerTrade / riskPerContract)
     const suggestedContracts = Math.min(
