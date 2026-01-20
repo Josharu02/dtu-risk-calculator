@@ -124,7 +124,7 @@ function App() {
     return TICK_VALUES[asset]
   }, [asset, customTickValue])
 
-  const markInputsChanged = () => {
+  const markCalculatorInputsChanged = () => {
     if (results) {
       setIsStale(true)
     }
@@ -134,6 +134,18 @@ function App() {
     if (Object.keys(errors).length > 0) {
       setErrors({})
     }
+    if (emailStatus !== 'idle') {
+      setEmailStatus('idle')
+    }
+    if (emailErrorMessage) {
+      setEmailErrorMessage('')
+    }
+    if (emailFieldError) {
+      setEmailFieldError('')
+    }
+  }
+
+  const markEmailInputsChanged = () => {
     if (emailStatus !== 'idle') {
       setEmailStatus('idle')
     }
@@ -456,9 +468,9 @@ function App() {
                   min="0"
                   value={profitTarget}
                   onChange={(event: ValueChangeEvent) => {
-                    setProfitTarget(event.target.value)
-                    markInputsChanged()
-                  }}
+                  setProfitTarget(event.target.value)
+                  markCalculatorInputsChanged()
+                }}
                   className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
                 />
                 {errors.profitTarget && (
@@ -479,9 +491,9 @@ function App() {
                   min="0"
                   value={maxLoss}
                   onChange={(event: ValueChangeEvent) => {
-                    setMaxLoss(event.target.value)
-                    markInputsChanged()
-                  }}
+                  setMaxLoss(event.target.value)
+                  markCalculatorInputsChanged()
+                }}
                   className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
                 />
                 {errors.maxLoss && (
@@ -500,9 +512,9 @@ function App() {
                   min="1"
                   value={maxContractSize}
                   onChange={(event: ValueChangeEvent) => {
-                    setMaxContractSize(event.target.value)
-                    markInputsChanged()
-                  }}
+                  setMaxContractSize(event.target.value)
+                  markCalculatorInputsChanged()
+                }}
                   className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
                 />
                 {errors.maxContractSize && (
@@ -523,9 +535,9 @@ function App() {
                   min="0"
                   value={dailyLossCap}
                   onChange={(event: ValueChangeEvent) => {
-                    setDailyLossCap(event.target.value)
-                    markInputsChanged()
-                  }}
+                  setDailyLossCap(event.target.value)
+                  markCalculatorInputsChanged()
+                }}
                   className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
                 />
                 {errors.dailyLossCap && (
@@ -546,9 +558,9 @@ function App() {
                   min="1"
                   value={tradesToBust}
                   onChange={(event: ValueChangeEvent) => {
-                    setTradesToBust(event.target.value)
-                    markInputsChanged()
-                  }}
+                  setTradesToBust(event.target.value)
+                  markCalculatorInputsChanged()
+                }}
                   className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
                 />
                 {errors.tradesToBust && (
@@ -571,11 +583,11 @@ function App() {
                     onChange={(event) => {
                       const nextValue = event.target.checked
                       setApplyConsistencyRule(nextValue)
-                      if (!nextValue) {
-                        setConsistencyRule('')
-                      }
-                      markInputsChanged()
-                    }}
+                    if (!nextValue) {
+                      setConsistencyRule('')
+                    }
+                    markCalculatorInputsChanged()
+                  }}
                     className="h-4 w-4 rounded border border-[#9AA4B2] text-[#1F6FFF] focus:ring-2 focus:ring-[#1F6FFF]/20"
                   />
                   Apply Consistency Rule
@@ -588,7 +600,7 @@ function App() {
                       value={consistencyRule}
                       onChange={(event: ValueChangeEvent) => {
                         setConsistencyRule(event.target.value)
-                        markInputsChanged()
+                        markCalculatorInputsChanged()
                       }}
                       className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
                     />
@@ -610,9 +622,9 @@ function App() {
                 <select
                   value={asset}
                   onChange={(event: ValueChangeEvent) => {
-                    setAsset(event.target.value as AssetKey)
-                    markInputsChanged()
-                  }}
+                  setAsset(event.target.value as AssetKey)
+                  markCalculatorInputsChanged()
+                }}
                   className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
                 >
                   {Object.keys(TICK_VALUES).map((key) => (
@@ -633,7 +645,7 @@ function App() {
                       value={customTickValue}
                       onChange={(event: ValueChangeEvent) => {
                         setCustomTickValue(event.target.value)
-                        markInputsChanged()
+                        markCalculatorInputsChanged()
                       }}
                       className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
                     />
@@ -655,9 +667,9 @@ function App() {
                   min="0"
                   value={stopTicks}
                   onChange={(event: ValueChangeEvent) => {
-                    setStopTicks(event.target.value)
-                    markInputsChanged()
-                  }}
+                  setStopTicks(event.target.value)
+                  markCalculatorInputsChanged()
+                }}
                   className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
                 />
                 {errors.stopTicks && (
@@ -711,9 +723,9 @@ function App() {
                   placeholder="Full name"
                   value={fullName}
                   onChange={(event: ValueChangeEvent) => {
-                    setFullName(event.target.value)
-                    markInputsChanged()
-                  }}
+                  setFullName(event.target.value)
+                  markEmailInputsChanged()
+                }}
                   className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
                 />
                 <input
@@ -721,9 +733,9 @@ function App() {
                   placeholder="Email address"
                   value={email}
                   onChange={(event: ValueChangeEvent) => {
-                    setEmail(event.target.value)
-                    markInputsChanged()
-                  }}
+                  setEmail(event.target.value)
+                  markEmailInputsChanged()
+                }}
                   className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
                 />
                 <label className="flex items-center gap-2 text-sm text-[#9AA4B2]">
@@ -731,9 +743,9 @@ function App() {
                     type="checkbox"
                     checked={consentEmail}
                     onChange={(event) => {
-                      setConsentEmail(event.target.checked)
-                      markInputsChanged()
-                    }}
+                    setConsentEmail(event.target.checked)
+                    markEmailInputsChanged()
+                  }}
                     className="h-4 w-4 rounded border border-[#9AA4B2] text-[#1F6FFF] focus:ring-2 focus:ring-[#1F6FFF]/20"
                   />
                   I consent to receive my trading plan by email.
