@@ -748,7 +748,7 @@ function App() {
             <form
               ref={emailFormRef}
               method="POST"
-              action="https://api.leadconnectorhq.com/widget/form/M64bV1aWnQ1v4q7T"
+              action="https://api.leadconnectorhq.com/widget/form/M64bV1aWnQ1v4q7TtEIO"
               target="ghl_target"
               className="hidden"
             >
