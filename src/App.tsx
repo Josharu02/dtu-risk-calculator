@@ -110,6 +110,7 @@ function App() {
   const [results, setResults] = useState<Results | null>(null)
   const [isStale, setIsStale] = useState(false)
   const [currentStep, setCurrentStep] = useState(0)
+  const [hasCalculated, setHasCalculated] = useState(false)
   const [emailStatus, setEmailStatus] = useState<'idle' | 'success' | 'error'>(
     'idle',
   )
@@ -126,6 +127,9 @@ function App() {
   const markInputsChanged = () => {
     if (results) {
       setIsStale(true)
+    }
+    if (hasCalculated) {
+      setHasCalculated(false)
     }
     if (Object.keys(errors).length > 0) {
       setErrors({})
@@ -225,6 +229,7 @@ function App() {
     setErrors({})
     setResults(nextResults)
     setIsStale(false)
+    setHasCalculated(true)
   }
 
   const validateStep = (stepIndex: number) => {
@@ -331,6 +336,7 @@ function App() {
     setCurrentStep(0)
     setErrors({})
     setIsStale(false)
+    setHasCalculated(false)
   }
 
   const handleEmailSubmit = async () => {
@@ -694,7 +700,7 @@ function App() {
             )}
           </div>
 
-          {currentStep === 7 && (
+          {currentStep === 7 && hasCalculated && (
             <div className="mt-8 rounded-2xl border border-[#9AA4B2] bg-white px-4 py-4">
               <p className="text-xs uppercase tracking-[0.2em] text-[#9AA4B2]">
                 Email my trading plan
@@ -732,11 +738,6 @@ function App() {
                   />
                   I consent to receive my trading plan by email.
                 </label>
-                {!results && (
-                  <p className="text-xs text-[#9AA4B2]">
-                    Complete the plan first, then email it to yourself.
-                  </p>
-                )}
                 {emailFieldError && (
                   <p className="text-xs text-[#D94A4A]">{emailFieldError}</p>
                 )}
