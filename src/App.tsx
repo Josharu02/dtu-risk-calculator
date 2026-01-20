@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 
 const TICK_VALUES = {
   ES: 12.5,
@@ -116,6 +116,7 @@ function App() {
   )
   const [emailErrorMessage, setEmailErrorMessage] = useState('')
   const [emailFieldError, setEmailFieldError] = useState('')
+  const emailFormRef = useRef<HTMLFormElement | null>(null)
 
   const tickValue = useMemo(() => {
     if (asset === 'Custom') {
@@ -351,7 +352,7 @@ function App() {
     setHasCalculated(false)
   }
 
-  const handleEmailSubmit = async () => {
+  const handleEmailSubmit = () => {
     if (!results) {
       return
     }
@@ -369,47 +370,10 @@ function App() {
     setEmailFieldError('')
     setEmailErrorMessage('')
 
-    const dailyLossLimitValue = Number(dailyLossCap)
-    const maxSlHitsPerDay = Math.floor(
-      dailyLossLimitValue / results.riskPerTrade,
-    )
-    const payload = new URLSearchParams({
-      full_name: fullName.trim(),
-      email: email.trim(),
-      profit_target: String(Number(profitTarget)),
-      max_loss_limit: String(Number(maxLoss)),
-      max_contract_size: String(Number(maxContractSize)),
-      daily_loss_limit: String(dailyLossLimitValue),
-      trades_until_lost: String(Number(tradesToBust)),
-      consistency_enabled: applyConsistencyRule ? 'true' : 'false',
-      consistency_rule: applyConsistencyRule ? consistencyRule.trim() : '',
-      product: asset,
-      stop_loss_ticks: String(Number(stopTicks)),
-      suggested_contracts: String(results.suggestedContracts),
-      risk_per_trade: String(results.riskPerTrade),
-      max_sl_hits_per_day: String(maxSlHitsPerDay),
-      daily_profit_target: String(results.dailyProfitThreshold ?? 0),
-      max_daily_profit: applyConsistencyRule ? String(maxDailyProfit) : '0',
-    })
-
-    try {
-      const response = await fetch(
-        'https://api.leadconnectorhq.com/widget/form/M64bV1aWnQ1v4q7TtEIO',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: payload.toString(),
-        },
-      )
-
-      if (!response.ok) {
-        throw new Error('Request failed')
-      }
-
+    if (emailFormRef.current) {
+      emailFormRef.current.submit()
       setEmailStatus('success')
-    } catch (error) {
+    } else {
       setEmailStatus('error')
       setEmailErrorMessage('Something went wrong. Please try again.')
     }
@@ -763,16 +727,104 @@ function App() {
                     {emailErrorMessage}
                   </p>
                 )}
-                <button
-                  onClick={handleEmailSubmit}
-                  disabled={!results || emailStatus === 'success'}
-                  className="inline-flex items-center justify-center rounded-full bg-[#1F6FFF] px-6 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-white shadow-lg shadow-[0_20px_60px_rgba(31,111,255,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_70px_rgba(31,111,255,0.45)] disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  Email My Trading Plan
-                </button>
-              </div>
+              <button
+                onClick={handleEmailSubmit}
+                disabled={!results || emailStatus === 'success'}
+                className="inline-flex items-center justify-center rounded-full bg-[#1F6FFF] px-6 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-white shadow-lg shadow-[0_20px_60px_rgba(31,111,255,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_70px_rgba(31,111,255,0.45)] disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                Email My Trading Plan
+              </button>
             </div>
-          )}
+          </div>
+        )}
+
+        {currentStep === 7 && hasCalculated && results && (
+          <>
+            <iframe
+              title="GHL Submit"
+              name="ghl_target"
+              className="hidden"
+            />
+            <form
+              ref={emailFormRef}
+              method="POST"
+              action="https://api.leadconnectorhq.com/widget/form/M64bV1aWnQ1v4q7T"
+              target="ghl_target"
+              className="hidden"
+            >
+              <input type="hidden" name="full_name" value={fullName.trim()} />
+              <input type="hidden" name="email" value={email.trim()} />
+              <input
+                type="hidden"
+                name="profit_target"
+                value={String(Number(profitTarget))}
+              />
+              <input
+                type="hidden"
+                name="max_loss_limit"
+                value={String(Number(maxLoss))}
+              />
+              <input
+                type="hidden"
+                name="max_contract_size"
+                value={String(Number(maxContractSize))}
+              />
+              <input
+                type="hidden"
+                name="daily_loss_limit"
+                value={String(Number(dailyLossCap))}
+              />
+              <input
+                type="hidden"
+                name="trades_until_lost"
+                value={String(Number(tradesToBust))}
+              />
+              <input
+                type="hidden"
+                name="consistency_enabled"
+                value={applyConsistencyRule ? 'true' : 'false'}
+              />
+              <input
+                type="hidden"
+                name="consistency_rule"
+                value={applyConsistencyRule ? consistencyRule.trim() : ''}
+              />
+              <input type="hidden" name="product" value={asset} />
+              <input
+                type="hidden"
+                name="stop_loss_ticks"
+                value={String(Number(stopTicks))}
+              />
+              <input
+                type="hidden"
+                name="suggested_contracts"
+                value={String(results.suggestedContracts)}
+              />
+              <input
+                type="hidden"
+                name="risk_per_trade"
+                value={String(results.riskPerTrade)}
+              />
+              <input
+                type="hidden"
+                name="max_sl_hits_per_day"
+                value={String(
+                  Math.floor(Number(dailyLossCap) / results.riskPerTrade),
+                )}
+              />
+              <input
+                type="hidden"
+                name="daily_profit_target"
+                value={String(results.dailyProfitThreshold ?? 0)}
+              />
+              <input
+                type="hidden"
+                name="max_daily_profit"
+                value={applyConsistencyRule ? String(maxDailyProfit) : '0'}
+              />
+            </form>
+          </>
+        )}
         </section>
 
         <section className="glass-panel rounded-3xl p-6 sm:p-8">
