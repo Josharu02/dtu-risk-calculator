@@ -694,63 +694,72 @@ function App() {
             )}
           </div>
 
-          <div className="mt-8 rounded-2xl border border-[#9AA4B2] bg-white px-4 py-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-[#9AA4B2]">
-              Email my trading plan
-            </p>
-            <div className="mt-3 space-y-3">
-              <input
-                type="text"
-                placeholder="Full name"
-                value={fullName}
-                onChange={(event: ValueChangeEvent) => {
-                  setFullName(event.target.value)
-                  markInputsChanged()
-                }}
-                className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
-              />
-              <input
-                type="email"
-                placeholder="Email address"
-                value={email}
-                onChange={(event: ValueChangeEvent) => {
-                  setEmail(event.target.value)
-                  markInputsChanged()
-                }}
-                className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
-              />
-              <label className="flex items-center gap-2 text-sm text-[#9AA4B2]">
+          {currentStep === 7 && (
+            <div className="mt-8 rounded-2xl border border-[#9AA4B2] bg-white px-4 py-4">
+              <p className="text-xs uppercase tracking-[0.2em] text-[#9AA4B2]">
+                Email my trading plan
+              </p>
+              <div className="mt-3 space-y-3">
                 <input
-                  type="checkbox"
-                  checked={consentEmail}
-                  onChange={(event) => {
-                    setConsentEmail(event.target.checked)
+                  type="text"
+                  placeholder="Full name"
+                  value={fullName}
+                  onChange={(event: ValueChangeEvent) => {
+                    setFullName(event.target.value)
                     markInputsChanged()
                   }}
-                  className="h-4 w-4 rounded border border-[#9AA4B2] text-[#1F6FFF] focus:ring-2 focus:ring-[#1F6FFF]/20"
+                  className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
                 />
-                I consent to receive my trading plan by email.
-              </label>
-              {emailFieldError && (
-                <p className="text-xs text-[#D94A4A]">{emailFieldError}</p>
-              )}
-              {emailStatus === 'success' && (
-                <p className="text-xs text-[#2ECC71]">
-                  Your trading plan has been emailed to you.
-                </p>
-              )}
-              {emailStatus === 'error' && (
-                <p className="text-xs text-[#D94A4A]">{emailErrorMessage}</p>
-              )}
-              <button
-                onClick={handleEmailSubmit}
-                disabled={!results || emailStatus === 'success'}
-                className="inline-flex items-center justify-center rounded-full bg-[#1F6FFF] px-6 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-white shadow-lg shadow-[0_20px_60px_rgba(31,111,255,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_70px_rgba(31,111,255,0.45)] disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                Email My Trading Plan
-              </button>
+                <input
+                  type="email"
+                  placeholder="Email address"
+                  value={email}
+                  onChange={(event: ValueChangeEvent) => {
+                    setEmail(event.target.value)
+                    markInputsChanged()
+                  }}
+                  className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
+                />
+                <label className="flex items-center gap-2 text-sm text-[#9AA4B2]">
+                  <input
+                    type="checkbox"
+                    checked={consentEmail}
+                    onChange={(event) => {
+                      setConsentEmail(event.target.checked)
+                      markInputsChanged()
+                    }}
+                    className="h-4 w-4 rounded border border-[#9AA4B2] text-[#1F6FFF] focus:ring-2 focus:ring-[#1F6FFF]/20"
+                  />
+                  I consent to receive my trading plan by email.
+                </label>
+                {!results && (
+                  <p className="text-xs text-[#9AA4B2]">
+                    Complete the plan first, then email it to yourself.
+                  </p>
+                )}
+                {emailFieldError && (
+                  <p className="text-xs text-[#D94A4A]">{emailFieldError}</p>
+                )}
+                {emailStatus === 'success' && (
+                  <p className="text-xs text-[#2ECC71]">
+                    Your trading plan has been emailed to you.
+                  </p>
+                )}
+                {emailStatus === 'error' && (
+                  <p className="text-xs text-[#D94A4A]">
+                    {emailErrorMessage}
+                  </p>
+                )}
+                <button
+                  onClick={handleEmailSubmit}
+                  disabled={!results || emailStatus === 'success'}
+                  className="inline-flex items-center justify-center rounded-full bg-[#1F6FFF] px-6 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-white shadow-lg shadow-[0_20px_60px_rgba(31,111,255,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_70px_rgba(31,111,255,0.45)] disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  Email My Trading Plan
+                </button>
+              </div>
             </div>
-          </div>
+          )}
         </section>
 
         <section className="glass-panel rounded-3xl p-6 sm:p-8">
