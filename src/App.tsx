@@ -310,6 +310,12 @@ function App() {
     setCurrentStep((step) => Math.max(step - 1, 0))
   }
 
+  const handleStartOver = () => {
+    setCurrentStep(0)
+    setErrors({})
+    setIsStale(false)
+  }
+
   const profitTargetValue = Number(profitTarget)
   const consistencyRuleValue = Number(consistencyRule)
   const showMaxDailyProfit =
@@ -578,7 +584,7 @@ function App() {
             <button
               onClick={handleBack}
               disabled={currentStep === 0}
-              className="inline-flex items-center justify-center rounded-full border border-[#9AA4B2] px-6 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#9AA4B2] transition disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex items-center justify-center rounded-full bg-[#1F6FFF] px-6 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white shadow-lg shadow-[0_20px_60px_rgba(31,111,255,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_70px_rgba(31,111,255,0.45)] disabled:cursor-not-allowed disabled:opacity-60"
             >
               Back
             </button>
@@ -590,12 +596,20 @@ function App() {
                 Next
               </button>
             ) : (
-              <button
-                onClick={handleCalculate}
-                className="inline-flex items-center justify-center rounded-full bg-[#1F6FFF] px-8 py-3 text-sm font-semibold uppercase tracking-[0.25em] text-white shadow-lg shadow-[0_20px_60px_rgba(31,111,255,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_70px_rgba(31,111,255,0.45)]"
-              >
-                Calculate
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={handleStartOver}
+                  className="inline-flex items-center justify-center rounded-full border border-[#1F6FFF] px-6 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#1F6FFF] transition hover:-translate-y-0.5 hover:shadow-[0_24px_70px_rgba(31,111,255,0.25)]"
+                >
+                  Start Over
+                </button>
+                <button
+                  onClick={handleCalculate}
+                  className="inline-flex items-center justify-center rounded-full bg-[#1F6FFF] px-8 py-3 text-sm font-semibold uppercase tracking-[0.25em] text-white shadow-lg shadow-[0_20px_60px_rgba(31,111,255,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_70px_rgba(31,111,255,0.45)]"
+                >
+                  Calculate
+                </button>
+              </div>
             )}
           </div>
         </section>
