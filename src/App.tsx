@@ -647,6 +647,7 @@ function App() {
                 </button>
                 <button
                   onClick={handleCalculate}
+                  type="button"
                   className="inline-flex items-center justify-center rounded-full bg-[#1F6FFF] px-8 py-3 text-sm font-semibold uppercase tracking-[0.25em] text-white shadow-lg shadow-[0_20px_60px_rgba(31,111,255,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_70px_rgba(31,111,255,0.45)]"
                 >
                   Calculate
