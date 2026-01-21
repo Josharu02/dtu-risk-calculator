@@ -710,6 +710,103 @@ function App() {
                   />
                   I consent to receive my trading plan by email.
                 </label>
+                <div className="rounded-xl border border-dashed border-[#9AA4B2] bg-white px-3 py-2 text-xs text-[#9AA4B2]">
+                  <div className="mb-2 uppercase tracking-[0.2em]">
+                    Plan details
+                  </div>
+                  <div className="grid gap-1 sm:grid-cols-2">
+                    <div>
+                      Product:{' '}
+                      <span className="font-semibold text-[#1F6FFF]">
+                        {asset}
+                      </span>
+                    </div>
+                    <div>
+                      Stop loss:{' '}
+                      <span className="font-semibold text-[#1F6FFF]">
+                        {Number(stopTicks)} ticks
+                      </span>
+                    </div>
+                    <div>
+                      Suggested contracts:{' '}
+                      <span className="font-semibold text-[#1F6FFF]">
+                        {results?.suggestedContracts ?? 0}
+                      </span>
+                    </div>
+                    <div>
+                      Risk per trade:{' '}
+                      <span className="font-semibold text-[#1F6FFF]">
+                        {formatCurrency(results?.riskPerTrade ?? 0)}
+                      </span>
+                    </div>
+                    <div>
+                      Profit target:{' '}
+                      <span className="font-semibold text-[#1F6FFF]">
+                        {formatCurrency(Number(profitTarget) || 0)}
+                      </span>
+                    </div>
+                    <div>
+                      Max loss limit:{' '}
+                      <span className="font-semibold text-[#1F6FFF]">
+                        {formatCurrency(Number(maxLoss) || 0)}
+                      </span>
+                    </div>
+                    <div>
+                      Max contract size:{' '}
+                      <span className="font-semibold text-[#1F6FFF]">
+                        {Number(maxContractSize) || 0}
+                      </span>
+                    </div>
+                    <div>
+                      Daily loss limit:{' '}
+                      <span className="font-semibold text-[#1F6FFF]">
+                        {formatCurrency(Number(dailyLossCap) || 0)}
+                      </span>
+                    </div>
+                    <div>
+                      Trades until lost:{' '}
+                      <span className="font-semibold text-[#1F6FFF]">
+                        {Number(tradesToBust) || 0}
+                      </span>
+                    </div>
+                    <div>
+                      Consistency enabled:{' '}
+                      <span className="font-semibold text-[#1F6FFF]">
+                        {applyConsistencyRule ? 'Yes' : 'No'}
+                      </span>
+                    </div>
+                    <div>
+                      Consistency rule:{' '}
+                      <span className="font-semibold text-[#1F6FFF]">
+                        {applyConsistencyRule
+                          ? `${consistencyRule || 0}%`
+                          : 'N/A'}
+                      </span>
+                    </div>
+                    <div>
+                      Max SL hits/day:{' '}
+                      <span className="font-semibold text-[#1F6FFF]">
+                        {results
+                          ? Math.floor(
+                              Number(dailyLossCap) / results.riskPerTrade,
+                            )
+                          : 0}
+                      </span>
+                    </div>
+                    <div>
+                      Daily profit target:{' '}
+                      <span className="font-semibold text-[#1F6FFF]">
+                        {formatCurrency(results?.dailyProfitThreshold ?? 0)}
+                      </span>
+                    </div>
+                    <div>
+                      Max daily profit:{' '}
+                      <span className="font-semibold text-[#1F6FFF]">
+                        {formatCurrency(applyConsistencyRule ? maxDailyProfit : 0)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
                 {emailStatus === 'success' && (
                   <p className="text-xs text-[#2ECC71]">
                     Your trading plan has been emailed to you.
