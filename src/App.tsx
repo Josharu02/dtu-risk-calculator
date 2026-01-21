@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 const TICK_VALUES = {
   ES: 12.5,
@@ -111,12 +111,9 @@ function App() {
   const [isStale, setIsStale] = useState(false)
   const [currentStep, setCurrentStep] = useState(0)
   const [hasCalculated, setHasCalculated] = useState(false)
-  const [emailStatus, setEmailStatus] = useState<'idle' | 'success' | 'error'>(
-    'idle',
-  )
-  const [emailErrorMessage, setEmailErrorMessage] = useState('')
-  const [emailFieldError, setEmailFieldError] = useState('')
-  const emailFormRef = useRef<HTMLFormElement | null>(null)
+  const [emailStatus, setEmailStatus] = useState<'idle' | 'success'>('idle')
+  const [isEmailSubmitting, setIsEmailSubmitting] = useState(false)
+  const submitTimeoutRef = useRef<number | null>(null)
 
   const tickValue = useMemo(() => {
     if (asset === 'Custom') {
@@ -138,25 +135,21 @@ function App() {
     if (emailStatus !== 'idle') {
       setEmailStatus('idle')
     }
-    if (emailErrorMessage) {
-      setEmailErrorMessage('')
-    }
-    if (emailFieldError) {
-      setEmailFieldError('')
-    }
   }
 
   const markEmailInputsChanged = () => {
     if (emailStatus !== 'idle') {
       setEmailStatus('idle')
     }
-    if (emailErrorMessage) {
-      setEmailErrorMessage('')
-    }
-    if (emailFieldError) {
-      setEmailFieldError('')
-    }
   }
+
+  useEffect(() => {
+    return () => {
+      if (submitTimeoutRef.current !== null) {
+        window.clearTimeout(submitTimeoutRef.current)
+      }
+    }
+  }, [])
 
   const handleCalculate = () => {
     setIsStale(false)
@@ -353,30 +346,14 @@ function App() {
   }
 
   const handleEmailSubmit = () => {
-    if (!results) {
-      return
+    setEmailStatus('success')
+    setIsEmailSubmitting(true)
+    if (submitTimeoutRef.current !== null) {
+      window.clearTimeout(submitTimeoutRef.current)
     }
-
-    if (email.trim() === '') {
-      setEmailFieldError('Email is required.')
-      return
-    }
-
-    if (!consentEmail) {
-      setEmailFieldError('You must consent to receive the email.')
-      return
-    }
-
-    setEmailFieldError('')
-    setEmailErrorMessage('')
-
-    if (emailFormRef.current) {
-      emailFormRef.current.submit()
-      setEmailStatus('success')
-    } else {
-      setEmailStatus('error')
-      setEmailErrorMessage('Something went wrong. Please try again.')
-    }
+    submitTimeoutRef.current = window.setTimeout(() => {
+      setIsEmailSubmitting(false)
+    }, 3000)
   }
 
   const toFormValue = (value: unknown) => String(value ?? '')
@@ -683,165 +660,142 @@ function App() {
               <p className="text-xs uppercase tracking-[0.2em] text-[#9AA4B2]">
                 Email my trading plan
               </p>
-              <div className="mt-3 space-y-3">
+              <iframe name="ghl_sink" style={{ display: 'none' }} />
+              <form
+                method="POST"
+                action="/"
+                target="ghl_sink"
+                onSubmit={handleEmailSubmit}
+                className="mt-3 space-y-3"
+              >
                 <input
                   type="text"
+                  name="full_name"
                   placeholder="Full name"
                   value={fullName}
                   onChange={(event: ValueChangeEvent) => {
-                  setFullName(event.target.value)
-                  markEmailInputsChanged()
-                }}
+                    setFullName(event.target.value)
+                    markEmailInputsChanged()
+                  }}
                   className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
                 />
                 <input
                   type="email"
+                  name="email"
+                  required
                   placeholder="Email address"
                   value={email}
                   onChange={(event: ValueChangeEvent) => {
-                  setEmail(event.target.value)
-                  markEmailInputsChanged()
-                }}
+                    setEmail(event.target.value)
+                    markEmailInputsChanged()
+                  }}
                   className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
                 />
                 <label className="flex items-center gap-2 text-sm text-[#9AA4B2]">
                   <input
                     type="checkbox"
+                    name="consent"
+                    required
                     checked={consentEmail}
                     onChange={(event) => {
-                    setConsentEmail(event.target.checked)
-                    markEmailInputsChanged()
-                  }}
+                      setConsentEmail(event.target.checked)
+                      markEmailInputsChanged()
+                    }}
                     className="h-4 w-4 rounded border border-[#9AA4B2] text-[#1F6FFF] focus:ring-2 focus:ring-[#1F6FFF]/20"
                   />
                   I consent to receive my trading plan by email.
                 </label>
-                {emailFieldError && (
-                  <p className="text-xs text-[#D94A4A]">{emailFieldError}</p>
-                )}
                 {emailStatus === 'success' && (
                   <p className="text-xs text-[#2ECC71]">
                     Your trading plan has been emailed to you.
                   </p>
                 )}
-                {emailStatus === 'error' && (
-                  <p className="text-xs text-[#D94A4A]">
-                    {emailErrorMessage}
-                  </p>
-                )}
-              <button
-                onClick={handleEmailSubmit}
-                disabled={!results || emailStatus === 'success'}
-                className="inline-flex items-center justify-center rounded-full bg-[#1F6FFF] px-6 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-white shadow-lg shadow-[0_20px_60px_rgba(31,111,255,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_70px_rgba(31,111,255,0.45)] disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                Email My Trading Plan
-              </button>
+                <input
+                  type="hidden"
+                  name="profit_target"
+                  value={toFormValue(Number(profitTarget))}
+                />
+                <input
+                  type="hidden"
+                  name="max_loss_limit"
+                  value={toFormValue(Number(maxLoss))}
+                />
+                <input
+                  type="hidden"
+                  name="max_contract_size"
+                  value={toFormValue(Number(maxContractSize))}
+                />
+                <input
+                  type="hidden"
+                  name="daily_loss_limit"
+                  value={toFormValue(Number(dailyLossCap))}
+                />
+                <input
+                  type="hidden"
+                  name="trades_until_lost"
+                  value={toFormValue(Number(tradesToBust))}
+                />
+                <input
+                  type="hidden"
+                  name="consistency_enabled"
+                  value={toFormValue(applyConsistencyRule ? 'true' : 'false')}
+                />
+                <input
+                  type="hidden"
+                  name="consistency_rule"
+                  value={toFormValue(
+                    applyConsistencyRule ? consistencyRule.trim() : '',
+                  )}
+                />
+                <input
+                  type="hidden"
+                  name="product"
+                  value={toFormValue(asset)}
+                />
+                <input
+                  type="hidden"
+                  name="stop_loss_ticks"
+                  value={toFormValue(Number(stopTicks))}
+                />
+                <input
+                  type="hidden"
+                  name="suggested_contracts"
+                  value={toFormValue(results?.suggestedContracts ?? 0)}
+                />
+                <input
+                  type="hidden"
+                  name="risk_per_trade"
+                  value={toFormValue(results?.riskPerTrade ?? 0)}
+                />
+                <input
+                  type="hidden"
+                  name="max_sl_hits_per_day"
+                  value={toFormValue(
+                    results
+                      ? Math.floor(Number(dailyLossCap) / results.riskPerTrade)
+                      : 0,
+                  )}
+                />
+                <input
+                  type="hidden"
+                  name="daily_profit_target"
+                  value={toFormValue(results?.dailyProfitThreshold ?? 0)}
+                />
+                <input
+                  type="hidden"
+                  name="max_daily_profit"
+                  value={toFormValue(applyConsistencyRule ? maxDailyProfit : 0)}
+                />
+                <button
+                  type="submit"
+                  disabled={!results || isEmailSubmitting}
+                  className="inline-flex items-center justify-center rounded-full bg-[#1F6FFF] px-6 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-white shadow-lg shadow-[0_20px_60px_rgba(31,111,255,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_70px_rgba(31,111,255,0.45)] disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  Email My Trading Plan
+                </button>
+              </form>
             </div>
-          </div>
-        )}
-
-        {currentStep === 7 && hasCalculated && results && (
-          <>
-            <iframe
-              title="GHL Submit"
-              name="ghl_target"
-              className="hidden"
-              sandbox="allow-forms allow-same-origin"
-            />
-            <form
-              ref={emailFormRef}
-              method="POST"
-              action="https://api.leadconnectorhq.com/widget/form/M64bV1aWnQ1v4q7TtEIO"
-              target="ghl_target"
-              className="hidden"
-            >
-              <input
-                type="hidden"
-                name="full_name"
-                value={toFormValue(fullName.trim())}
-              />
-              <input
-                type="hidden"
-                name="email"
-                value={toFormValue(email.trim())}
-              />
-              <input
-                type="hidden"
-                name="profit_target"
-                value={toFormValue(Number(profitTarget))}
-              />
-              <input
-                type="hidden"
-                name="max_loss_limit"
-                value={toFormValue(Number(maxLoss))}
-              />
-              <input
-                type="hidden"
-                name="max_contract_size"
-                value={toFormValue(Number(maxContractSize))}
-              />
-              <input
-                type="hidden"
-                name="daily_loss_limit"
-                value={toFormValue(Number(dailyLossCap))}
-              />
-              <input
-                type="hidden"
-                name="trades_until_lost"
-                value={toFormValue(Number(tradesToBust))}
-              />
-              <input
-                type="hidden"
-                name="consistency_enabled"
-                value={toFormValue(applyConsistencyRule ? 'true' : 'false')}
-              />
-              <input
-                type="hidden"
-                name="consistency_rule"
-                value={toFormValue(
-                  applyConsistencyRule ? consistencyRule.trim() : '',
-                )}
-              />
-              <input
-                type="hidden"
-                name="product"
-                value={toFormValue(asset)}
-              />
-              <input
-                type="hidden"
-                name="stop_loss_ticks"
-                value={toFormValue(Number(stopTicks))}
-              />
-              <input
-                type="hidden"
-                name="suggested_contracts"
-                value={toFormValue(results.suggestedContracts)}
-              />
-              <input
-                type="hidden"
-                name="risk_per_trade"
-                value={toFormValue(results.riskPerTrade)}
-              />
-              <input
-                type="hidden"
-                name="max_sl_hits_per_day"
-                value={toFormValue(
-                  Math.floor(Number(dailyLossCap) / results.riskPerTrade),
-                )}
-              />
-              <input
-                type="hidden"
-                name="daily_profit_target"
-                value={toFormValue(results.dailyProfitThreshold ?? 0)}
-              />
-              <input
-                type="hidden"
-                name="max_daily_profit"
-                value={toFormValue(applyConsistencyRule ? maxDailyProfit : 0)}
-              />
-            </form>
-          </>
-        )}
+          )}
         </section>
 
         <section className="glass-panel rounded-3xl p-6 sm:p-8">
