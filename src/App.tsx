@@ -656,8 +656,11 @@ function App() {
             )}
           </div>
 
-          {currentStep === 7 && hasCalculated && (
-            <div className="mt-8 rounded-2xl border border-[#9AA4B2] bg-white px-4 py-4">
+          <div
+            className={`mt-8 rounded-2xl border border-[#9AA4B2] bg-white px-4 py-4 ${
+              currentStep === 7 && hasCalculated ? '' : 'hidden'
+            }`}
+          >
               <p className="text-xs uppercase tracking-[0.2em] text-[#9AA4B2]">
                 Email my trading plan
               </p>
@@ -797,7 +800,6 @@ function App() {
                 </button>
               </form>
             </div>
-          )}
         </section>
 
         <section className="glass-panel rounded-3xl p-6 sm:p-8">
