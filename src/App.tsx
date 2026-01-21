@@ -666,6 +666,7 @@ function App() {
                 method="POST"
                 action="/"
                 target="ghl_sink"
+                name="DTU Risk Calculator – Email Plan"
                 onSubmit={handleEmailSubmit}
                 className="mt-3 space-y-3"
               >
