@@ -148,7 +148,9 @@ function App() {
     }
   }
 
-  const handleCalculate = () => {
+  const handleCalculate = (event?: React.SyntheticEvent) => {
+    event?.preventDefault()
+    event?.stopPropagation()
     setIsStale(false)
     const nextErrors: Errors = {}
     const maxContractSizeValue = Number(maxContractSize)
