@@ -111,7 +111,10 @@ function App() {
   const [isStale, setIsStale] = useState(false)
   const [currentStep, setCurrentStep] = useState(0)
   const [hasCalculated, setHasCalculated] = useState(false)
-  const [emailStatus, setEmailStatus] = useState<'idle' | 'success'>('idle')
+  const [emailStatus, setEmailStatus] = useState<'idle' | 'success' | 'error'>(
+    'idle',
+  )
+  const [emailError, setEmailError] = useState('')
   const [isEmailSubmitting, setIsEmailSubmitting] = useState(false)
   const submitTimeoutRef = useRef<number | null>(null)
 
@@ -140,6 +143,9 @@ function App() {
   const markEmailInputsChanged = () => {
     if (emailStatus !== 'idle') {
       setEmailStatus('idle')
+    }
+    if (emailError) {
+      setEmailError('')
     }
   }
 
@@ -345,15 +351,81 @@ function App() {
     setHasCalculated(false)
   }
 
-  const handleEmailSubmit = () => {
-    setEmailStatus('success')
-    setIsEmailSubmitting(true)
-    if (submitTimeoutRef.current !== null) {
-      window.clearTimeout(submitTimeoutRef.current)
+  const handleEmailSubmit = async () => {
+    if (isEmailSubmitting || !results) {
+      return
     }
-    submitTimeoutRef.current = window.setTimeout(() => {
+
+    if (!email.trim() || !consentEmail) {
+      setEmailError('Enter your email and consent to receive the plan.')
+      setEmailStatus('error')
+      return
+    }
+
+    setEmailStatus('idle')
+    setEmailError('')
+    setIsEmailSubmitting(true)
+
+    const payload = {
+      full_name: fullName.trim(),
+      email: email.trim(),
+      consent: consentEmail,
+      profit_target: Number(profitTarget),
+      max_loss_limit: Number(maxLoss),
+      max_contract_size: Number(maxContractSize),
+      daily_loss_limit: Number(dailyLossCap),
+      trades_until_lost: Number(tradesToBust),
+      consistency_enabled: applyConsistencyRule,
+      consistency_rule: applyConsistencyRule ? consistencyRule.trim() : '',
+      product: asset,
+      stop_loss_ticks: Number(stopTicks),
+      suggested_contracts: results.suggestedContracts,
+      risk_per_trade: results.riskPerTrade,
+      max_sl_hits_per_day: Math.floor(
+        Number(dailyLossCap) / results.riskPerTrade,
+      ),
+      daily_profit_target: results.dailyProfitThreshold ?? 0,
+      max_daily_profit: applyConsistencyRule ? maxDailyProfit : 0,
+    }
+
+    try {
+      const response = await fetch(
+        'https://dtu-risk-calculator-api.onrender.com/email-plan',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        },
+      )
+
+      if (!response.ok) {
+        let message = 'Unable to email the plan. Please try again.'
+        try {
+          const data = await response.json()
+          if (data?.message) {
+            message = data.message
+          }
+        } catch (error) {
+          if (error) {
+            message = 'Unable to email the plan. Please try again.'
+          }
+        }
+        setEmailError(message)
+        setEmailStatus('error')
+        return
+      }
+
+      setEmailStatus('success')
+    } catch (error) {
+      if (error) {
+        setEmailError('Unable to email the plan. Please try again.')
+      }
+      setEmailStatus('error')
+    } finally {
       setIsEmailSubmitting(false)
-    }, 3000)
+    }
   }
 
   const toFormValue = (value: unknown) => String(value ?? '')
