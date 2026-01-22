@@ -658,7 +658,7 @@ function App() {
 
           <div
             className={`mt-8 rounded-2xl border border-[#9AA4B2] bg-white px-4 py-4 ${
-              currentStep === 7 && hasCalculated ? '' : 'hidden'
+              hasCalculated ? 'visible' : 'hidden'
             }`}
           >
               <p className="text-xs uppercase tracking-[0.2em] text-[#9AA4B2]">
@@ -669,7 +669,7 @@ function App() {
                 method="POST"
                 action="/"
                 target="ghl_sink"
-                name="DTU Risk Calculator – Email Plan"
+                name="dtu-risk-calculator-email-plan"
                 onSubmit={handleEmailSubmit}
                 className="mt-3 space-y-3"
               >
