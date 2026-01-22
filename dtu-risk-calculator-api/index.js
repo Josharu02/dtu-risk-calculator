@@ -49,8 +49,12 @@ app.post('/email-plan', async (req, res) => {
   }
 
   const email = String(payload.email || '').trim()
+  const fullName = String(payload.full_name || '').trim()
   if (!email) {
     return res.status(400).json({ ok: false, error: 'Email is required.' })
+  }
+  if (!fullName) {
+    return res.status(400).json({ ok: false, error: 'Name is required.' })
   }
 
   const locationId = process.env.GHL_LOCATION_ID || DEFAULT_LOCATION_ID
@@ -65,7 +69,7 @@ app.post('/email-plan', async (req, res) => {
       body: JSON.stringify({
         locationId,
         email,
-        name: String(payload.full_name || ''),
+        name: fullName,
         customFields: toStringMap({
           profit_target: payload.profit_target,
           max_loss_limit: payload.max_loss_limit,
@@ -87,6 +91,9 @@ app.post('/email-plan', async (req, res) => {
 
     if (!contactResponse.ok) {
       const errorText = await contactResponse.text()
+      if (contactResponse.status === 401 || contactResponse.status === 403) {
+        return res.status(500).json({ ok: false, error: 'Invalid GHL API key.' })
+      }
       return res.status(502).json({ ok: false, error: 'Failed to create/update contact.', details: errorText })
     }
 
@@ -108,6 +115,9 @@ app.post('/email-plan', async (req, res) => {
 
     if (!tagResponse.ok) {
       const errorText = await tagResponse.text()
+      if (tagResponse.status === 401 || tagResponse.status === 403) {
+        return res.status(500).json({ ok: false, error: 'Invalid GHL API key.' })
+      }
       return res.status(502).json({ ok: false, error: 'Failed to tag contact.', details: errorText })
     }
 
