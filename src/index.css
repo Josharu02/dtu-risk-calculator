@@ -4,6 +4,15 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  input::placeholder,
+  textarea::placeholder {
+    color: #64748b;
+    font-size: 0.875em;
+    font-weight: 400;
+  }
+}
+
 :root {
   color-scheme: light;
   --brand: #1f6fff;
@@ -69,4 +78,23 @@ body::after {
   border: 1px solid rgba(154, 164, 178, 0.35);
   box-shadow: 0 20px 60px rgba(31, 111, 255, 0.08);
   backdrop-filter: blur(12px);
+}
+
+@layer components {
+  .section-title {
+    @apply text-[#0F172A] font-semibold;
+  }
+
+  .body-text {
+    @apply text-[#334155] font-normal;
+  }
+
+  .label-text {
+    @apply text-[#475569] font-medium;
+  }
+
+  .helper-text {
+    color: #64748b;
+    font-size: 0.7rem;
+  }
 }
