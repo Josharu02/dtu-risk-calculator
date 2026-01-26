@@ -450,23 +450,23 @@ function App() {
       <main className="mx-auto mt-8 grid w-full max-w-6xl grid-cols-1 gap-6 lg:grid-cols-[1.1fr_0.9fr]">
         <section className="glass-panel rounded-3xl p-6 sm:p-8">
           <div className="mb-6">
-            <h2 className="title-font text-2xl text-[#1F6FFF] sm:text-3xl">
+            <h2 className="title-font section-title text-2xl sm:text-3xl">
               Configure your risk inputs
             </h2>
-            <p className="mt-2 text-sm text-[#9AA4B2]">
+            <p className="mt-2 text-sm body-text">
               Plug in your firm limits, pick the contract, and we will align risk
               per trade with your stop size.
             </p>
           </div>
 
-          <div className="text-xs uppercase tracking-[0.2em] text-[#9AA4B2]">
+          <div className="helper-text uppercase tracking-[0.2em]">
             Step {currentStep + 1} of 8
           </div>
 
           <div className="mt-5 space-y-5">
             {currentStep === 0 && (
               <div className="space-y-2">
-                <label className="text-sm font-medium text-[#9AA4B2]">
+                <label className="text-sm label-text">
                   Profit Target ($)
                 </label>
                 <input
@@ -489,7 +489,7 @@ function App() {
 
             {currentStep === 1 && (
               <div className="space-y-2">
-                <label className="text-sm font-medium text-[#9AA4B2]">
+                <label className="text-sm label-text">
                   Max Loss Limit ($)
                 </label>
                 <input
@@ -510,7 +510,7 @@ function App() {
 
             {currentStep === 2 && (
               <div className="space-y-2">
-                <label className="text-sm font-medium text-[#9AA4B2]">
+                <label className="text-sm label-text">
                   Max Contract Size
                 </label>
                 <input
@@ -533,7 +533,7 @@ function App() {
 
             {currentStep === 3 && (
               <div className="space-y-2">
-                <label className="text-sm font-medium text-[#9AA4B2]">
+                <label className="text-sm label-text">
                   Daily Loss Limit ($)
                 </label>
                 <input
@@ -556,7 +556,7 @@ function App() {
 
             {currentStep === 4 && (
               <div className="space-y-2">
-                <label className="text-sm font-medium text-[#9AA4B2]">
+                <label className="text-sm label-text">
                   Trades until account is lost
                 </label>
                 <input
@@ -579,10 +579,10 @@ function App() {
 
             {currentStep === 5 && (
               <div className="space-y-2">
-                <label className="text-sm font-medium text-[#9AA4B2]">
+                <label className="text-sm label-text">
                   Consistency Rule
                 </label>
-                <label className="flex items-center gap-2 text-sm text-[#9AA4B2]">
+                <label className="flex items-center gap-2 text-sm label-text">
                   <input
                     type="checkbox"
                     checked={applyConsistencyRule}
@@ -622,7 +622,7 @@ function App() {
 
             {currentStep === 6 && (
               <div className="space-y-2">
-                <label className="text-sm font-medium text-[#9AA4B2]">
+                <label className="text-sm label-text">
                   What do you trade?
                 </label>
                 <select
@@ -642,7 +642,7 @@ function App() {
                 </select>
                 {asset === 'Custom' && (
                   <>
-                    <label className="text-sm font-medium text-[#9AA4B2]">
+                    <label className="text-sm label-text">
                       Tick Value ($/tick)
                     </label>
                     <input
@@ -665,7 +665,7 @@ function App() {
 
             {currentStep === 7 && (
               <div className="space-y-2">
-                <label className="text-sm font-medium text-[#9AA4B2]">
+                <label className="text-sm label-text">
                   What size stop loss do you use? (in ticks)
                 </label>
                 <input
@@ -724,7 +724,7 @@ function App() {
               hasCalculated ? 'visible' : 'hidden'
             }`}
           >
-            <p className="text-xs uppercase tracking-[0.2em] text-[#9AA4B2]">
+            <p className="helper-text uppercase tracking-[0.2em]">
               Email my trading plan
             </p>
             <div className="mt-3 space-y-3">
@@ -751,7 +751,7 @@ function App() {
                 }}
                 className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
               />
-              <label className="flex items-center gap-2 text-sm text-[#9AA4B2]">
+              <label className="flex items-center gap-2 text-sm label-text">
                 <input
                   type="checkbox"
                   name="consent"
@@ -765,7 +765,7 @@ function App() {
                 />
                 I consent to receive my trading plan by email.
               </label>
-              <div className="rounded-xl border border-dashed border-[#9AA4B2] bg-white px-3 py-2 text-xs text-[#9AA4B2]">
+              <div className="rounded-xl border border-dashed border-[#9AA4B2] bg-white px-3 py-2 helper-text">
                 <div className="mb-2 uppercase tracking-[0.2em]">
                   Plan details
                 </div>
@@ -884,10 +884,10 @@ function App() {
 
         <section className="glass-panel rounded-3xl p-6 sm:p-8">
           <div className="mb-6">
-            <h2 className="title-font text-2xl text-[#1F6FFF] sm:text-3xl">
+            <h2 className="title-font section-title text-2xl sm:text-3xl">
               Risk outputs
             </h2>
-            <p className="mt-2 text-sm text-[#9AA4B2]">
+            <p className="mt-2 text-sm body-text">
               Use these numbers to keep each trade aligned with your firm limits.
             </p>
           </div>
@@ -900,10 +900,10 @@ function App() {
                 </p>
               )}
               <div className="rounded-2xl bg-white px-4 py-3">
-                <p className="text-xs uppercase tracking-[0.2em] text-[#9AA4B2]">
+                <p className="helper-text uppercase tracking-[0.2em]">
                   Risk management
                 </p>
-                <p className="mt-2 text-sm text-[#9AA4B2]">
+                <p className="mt-2 text-sm body-text">
                   Since you trade <span className="font-semibold text-[#1F6FFF]">{asset}</span> and you normally use a <span className="font-semibold text-[#1F6FFF]">{stopTicks}</span>{' '}
                   tick stop loss, you should be using{' '}
                   <span className="font-semibold text-[#1F6FFF]">{results.suggestedContracts}</span> contracts. This means you’d be
@@ -917,11 +917,11 @@ function App() {
 
               {(!applyConsistencyRule || showMaxDailyProfit) && (
                 <div className="rounded-2xl bg-white px-4 py-3">
-                  <p className="text-xs uppercase tracking-[0.2em] text-[#9AA4B2]">
+                  <p className="helper-text uppercase tracking-[0.2em]">
                     Profit goals
                   </p>
                   {!applyConsistencyRule && (
-                    <p className="mt-2 text-sm text-[#9AA4B2]">
+                    <p className="mt-2 text-sm body-text">
                       Your daily profit target is{' '}
                       <span className="font-semibold text-[#2ECC71]">{formatCurrency(results.dailyProfitThreshold ?? 0)}</span> and
                       you don’t have a consistency rule, so anything above that
@@ -929,7 +929,7 @@ function App() {
                     </p>
                   )}
                   {showMaxDailyProfit && (
-                    <p className="mt-2 text-sm text-[#9AA4B2]">
+                    <p className="mt-2 text-sm body-text">
                       Your daily profit target is{' '}
                       <span className="font-semibold text-[#2ECC71]">{formatCurrency(results.dailyProfitThreshold ?? 0)}</span> and
                       since you have a consistency rule, make sure you don’t
@@ -952,3 +952,4 @@ function App() {
 }
 
 export default App
+
