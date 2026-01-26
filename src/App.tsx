@@ -459,7 +459,7 @@ function App() {
             </p>
           </div>
 
-          <div className="helper-text uppercase tracking-[0.2em]">
+          <div className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
             Step {currentStep + 1} of 8
           </div>
 
@@ -724,7 +724,7 @@ function App() {
               hasCalculated ? 'visible' : 'hidden'
             }`}
           >
-            <p className="helper-text uppercase tracking-[0.2em]">
+            <p className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
               Email my trading plan
             </p>
             <div className="mt-3 space-y-3">
@@ -900,7 +900,7 @@ function App() {
                 </p>
               )}
               <div className="rounded-2xl bg-white px-4 py-3">
-                <p className="helper-text uppercase tracking-[0.2em]">
+                <p className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
                   Risk management
                 </p>
                 <p className="mt-2 text-sm body-text">
@@ -917,7 +917,7 @@ function App() {
 
               {(!applyConsistencyRule || showMaxDailyProfit) && (
                 <div className="rounded-2xl bg-white px-4 py-3">
-                  <p className="helper-text uppercase tracking-[0.2em]">
+                  <p className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
                     Profit goals
                   </p>
                   {!applyConsistencyRule && (

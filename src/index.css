@@ -7,9 +7,7 @@
 @layer base {
   input::placeholder,
   textarea::placeholder {
-    color: #64748b;
-    font-size: 0.875em;
-    font-weight: 400;
+    color: #374151;
   }
 }
 
@@ -82,19 +80,18 @@ body::after {
 
 @layer components {
   .section-title {
-    @apply text-[#0F172A] font-semibold;
+    @apply text-black font-bold;
   }
 
   .body-text {
-    @apply text-[#334155] font-normal;
+    @apply text-[#1F2937] font-normal;
   }
 
   .label-text {
-    @apply text-[#475569] font-medium;
+    @apply text-[#111827] font-medium;
   }
 
   .helper-text {
-    color: #64748b;
-    font-size: 0.7rem;
+    color: #374151;
   }
 }
