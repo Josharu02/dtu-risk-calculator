@@ -203,6 +203,11 @@ function App() {
     }
 
     const tradesUntilLost = tradesToBustValue
+    const maxContractSizeValue = Number(maxContractSize)
+    const capValue = Number.isFinite(maxContractSizeValue)
+      ? maxContractSizeValue
+      : Number.POSITIVE_INFINITY
+
     if (!Number.isFinite(tradesUntilLost) || tradesUntilLost <= 0) {
       setErrors({
         tradesToBust:
@@ -215,13 +220,16 @@ function App() {
 
     const riskPerTrade = profitTargetValue / tradesUntilLost
     const riskPerContract = stopTicksValue * tickValue
-    const suggestedContractsRaw = profitTargetValue / tradesUntilLost
-    const suggestedContracts = Math.max(1, Math.round(suggestedContractsRaw))
+    const suggestedRaw = profitTargetValue / tradesUntilLost
+    const suggestedRounded = Math.round(suggestedRaw)
+    const suggestedCapped = Math.min(capValue, suggestedRounded)
+    const suggestedContracts = Math.max(1, suggestedCapped)
 
     console.log({
       profitTarget: profitTargetValue,
       tradesUntilLost,
-      suggestedContractsRaw,
+      maxContractSize: capValue,
+      suggestedRaw,
       suggestedContracts,
     })
     const riskPerTradeTicks = riskPerTrade / tickValue
