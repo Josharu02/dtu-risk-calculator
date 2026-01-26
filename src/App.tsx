@@ -202,13 +202,28 @@ function App() {
       return
     }
 
-    const riskPerTrade = profitTargetValue / tradesToBustValue
+    const tradesUntilLost = tradesToBustValue
+    if (!Number.isFinite(tradesUntilLost) || tradesUntilLost <= 0) {
+      setErrors({
+        tradesToBust:
+          'Trades until account is lost must be at least 1.',
+      })
+      setResults(null)
+      setIsStale(false)
+      return
+    }
+
+    const riskPerTrade = profitTargetValue / tradesUntilLost
     const riskPerContract = stopTicksValue * tickValue
-    const suggestedContractsRaw = Math.floor(riskPerTrade / riskPerContract)
-    const suggestedContracts = Math.min(
+    const suggestedContractsRaw = profitTargetValue / tradesUntilLost
+    const suggestedContracts = Math.max(1, Math.round(suggestedContractsRaw))
+
+    console.log({
+      profitTarget: profitTargetValue,
+      tradesUntilLost,
       suggestedContractsRaw,
-      Math.floor(maxContractSizeValue),
-    )
+      suggestedContracts,
+    })
     const riskPerTradeTicks = riskPerTrade / tickValue
 
     if (riskPerTrade > dailyLossCapValue) {
