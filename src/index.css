@@ -80,11 +80,13 @@ body::after {
 
 @layer components {
   .section-title {
-    @apply text-black font-bold;
+    color: var(--brand);
+    font-weight: 700;
   }
 
   .body-text {
-    @apply text-[#1F2937] font-normal;
+    color: #111111;
+    font-weight: 500;
   }
 
   .label-text {
@@ -92,6 +94,7 @@ body::after {
   }
 
   .helper-text {
-    color: #374151;
+    color: #111111;
+    font-weight: 600;
   }
 }
