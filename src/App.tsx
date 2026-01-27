@@ -832,7 +832,7 @@ function App() {
             )}
           </div>
 
-          {isFinalStep && (
+          {isFinalStep && calculated && (
           <div className="mt-10 rounded-2xl border border-[#9AA4B2] bg-white px-4 py-4">
             <p className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
               Email my trading plan
@@ -973,11 +973,7 @@ function App() {
                     </div>
                   </div>
                 </div>
-              ) : (
-                <p className="text-xs text-[#D94A4A]">
-                  Press Calculate to unlock email.
-                </p>
-              )}
+              ) : null}
               {emailStatus === 'success' && (
                 <p className="text-xs text-[#2ECC71]">
                   Your trading plan has been emailed to you.
