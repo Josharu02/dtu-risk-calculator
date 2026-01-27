@@ -116,6 +116,9 @@ function App() {
   )
   const [emailError, setEmailError] = useState('')
   const [isEmailSubmitting, setIsEmailSubmitting] = useState(false)
+  const [rightPanelView, setRightPanelView] = useState<'outputs' | 'email'>(
+    'outputs',
+  )
 
   const maxContractSizeValue = Number(maxContractSize)
   const tickValue = useMemo(() => {
@@ -453,7 +456,15 @@ function App() {
 
   const profitTargetValue = Number(profitTarget)
   const consistencyRuleValue = Number(consistencyRule)
+  const showMaxDailyProfit =
+    applyConsistencyRule &&
+    consistencyRule.trim() !== '' &&
+    Number.isFinite(consistencyRuleValue) &&
+    consistencyRuleValue > 0 &&
+    Number.isFinite(profitTargetValue) &&
+    profitTargetValue > 0
   const maxDailyProfit = profitTargetValue * (consistencyRuleValue / 100)
+  const dailyLossLimitValue = Number(dailyLossCap)
 
   return (
     <div className="min-h-screen px-4 pb-16 pt-6 sm:px-6 lg:px-10">
@@ -741,167 +752,69 @@ function App() {
             )}
           </div>
 
-          <div
-            className={`mt-8 rounded-2xl border border-[#9AA4B2] bg-white px-4 py-4 ${
-              hasCalculated ? 'visible' : 'hidden'
-            }`}
-          >
-            <p className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
-              Email my trading plan
-            </p>
-            <div className="mt-3 space-y-3">
-              <input
-                type="text"
-                name="full_name"
-                placeholder="Full name"
-                value={fullName}
-                onChange={(event: ValueChangeEvent) => {
-                  setFullName(event.target.value)
-                  markEmailInputsChanged()
-                }}
-                className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
-              />
-              <input
-                type="email"
-                name="email"
-                required
-                placeholder="Email address"
-                value={email}
-                onChange={(event: ValueChangeEvent) => {
-                  setEmail(event.target.value)
-                  markEmailInputsChanged()
-                }}
-                className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
-              />
-              <label className="flex items-center gap-2 text-sm label-text">
-                <input
-                  type="checkbox"
-                  name="consent"
-                  required
-                  checked={consentEmail}
-                  onChange={(event) => {
-                    setConsentEmail(event.target.checked)
-                    markEmailInputsChanged()
-                  }}
-                  className="h-4 w-4 rounded border border-[#9AA4B2] text-[#1F6FFF] focus:ring-2 focus:ring-[#1F6FFF]/20"
-                />
-                I consent to receive my trading plan by email.
-              </label>
-              <div className="rounded-xl border border-dashed border-[#9AA4B2] bg-white px-3 py-2 helper-text">
-                <div className="mb-2 uppercase tracking-[0.2em]">
-                  Plan details
-                </div>
-                <div className="grid gap-1 sm:grid-cols-2">
-                  <div>
-                    Product:{' '}
-                    <span className="font-semibold text-[#1F6FFF]">
-                      {asset}
-                    </span>
-                  </div>
-                  <div>
-                    Stop loss:{' '}
-                    <span className="font-semibold text-[#1F6FFF]">
-                      {Number(stopTicks)} ticks
-                    </span>
-                  </div>
-                  <div>
-                    Suggested contracts:{' '}
-                    <span className="font-semibold text-[#1F6FFF]">
-                      {results?.suggestedContracts ?? 0}
-                    </span>
-                  </div>
-                  <div>
-                    Risk per trade:{' '}
-                    <span className="font-semibold text-[#1F6FFF]">
-                      {formatCurrency(results?.riskPerTrade ?? 0)}
-                    </span>
-                  </div>
-                  <div>
-                    Profit target:{' '}
-                    <span className="font-semibold text-[#1F6FFF]">
-                      {formatCurrency(Number(profitTarget) || 0)}
-                    </span>
-                  </div>
-                  <div>
-                    Max loss limit:{' '}
-                    <span className="font-semibold text-[#1F6FFF]">
-                      {formatCurrency(Number(maxLoss) || 0)}
-                    </span>
-                  </div>
-                  <div>
-                    Max contract size:{' '}
-                    <span className="font-semibold text-[#1F6FFF]">
-                      {Number(maxContractSize) || 0}
-                    </span>
-                  </div>
-                  <div>
-                    Daily loss limit:{' '}
-                    <span className="font-semibold text-[#1F6FFF]">
-                      {formatCurrency(Number(dailyLossCap) || 0)}
-                    </span>
-                  </div>
-                  <div>
-                    Trades until lost:{' '}
-                    <span className="font-semibold text-[#1F6FFF]">
-                      {Number(tradesToBust) || 0}
-                    </span>
-                  </div>
-                  <div>
-                    Consistency enabled:{' '}
-                    <span className="font-semibold text-[#1F6FFF]">
-                      {applyConsistencyRule ? 'Yes' : 'No'}
-                    </span>
-                  </div>
-                  <div>
-                    Consistency rule:{' '}
-                    <span className="font-semibold text-[#1F6FFF]">
-                      {applyConsistencyRule
-                        ? `${consistencyRule || 0}%`
-                        : 'N/A'}
-                    </span>
-                  </div>
-                  <div>
-                    Max SL hits/day:{' '}
-                    <span className="font-semibold text-[#1F6FFF]">
-                      {results
-                        ? Math.floor(
-                            Number(dailyLossCap) / results.riskPerTrade,
-                          )
-                        : 0}
-                    </span>
-                  </div>
-                  <div>
-                    Daily profit target:{' '}
-                    <span className="font-semibold text-[#1F6FFF]">
-                      {formatCurrency(results?.dailyProfitThreshold ?? 0)}
-                    </span>
-                  </div>
-                  <div>
-                    Max daily profit:{' '}
-                    <span className="font-semibold text-[#1F6FFF]">
-                      {formatCurrency(applyConsistencyRule ? maxDailyProfit : 0)}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              {emailStatus === 'success' && (
-                <p className="text-xs text-[#2ECC71]">
-                  Your trading plan has been emailed to you.
+          {results && (
+            <div className="mt-8 space-y-4 text-sm" aria-disabled={isStale}>
+              <div className="rounded-2xl bg-white px-4 py-3">
+                <p className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
+                  Risk management
                 </p>
+                <p className="mt-2 text-sm body-text">
+                  Since you trade{' '}
+                  <span className="font-semibold text-[#1F6FFF]">{asset}</span>{' '}
+                  and you normally use a{' '}
+                  <span className="font-semibold text-[#1F6FFF]">
+                    {stopTicks}
+                  </span>{' '}
+                  tick stop loss, you should be using{' '}
+                  <span className="font-semibold text-[#1F6FFF]">
+                    {results.suggestedContracts}
+                  </span>{' '}
+                  contracts. This means youâ€™d be risking{' '}
+                  {formatCurrency(results.riskPerTrade)} per trade. With a Daily
+                  Loss Limit of{' '}
+                  <span className="font-semibold text-[#D94A4A]">
+                    {formatCurrency(dailyLossLimitValue)}
+                  </span>
+                  , you could take{' '}
+                  {Math.floor(dailyLossLimitValue / results.riskPerTrade)} full
+                  stop loss hits before stopping for the day.
+                </p>
+              </div>
+
+              {(!applyConsistencyRule || showMaxDailyProfit) && (
+                <div className="rounded-2xl bg-white px-4 py-3">
+                  <p className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
+                    Profit goals
+                  </p>
+                  {!applyConsistencyRule && (
+                    <p className="mt-2 text-sm body-text">
+                      Your daily profit target is{' '}
+                      <span className="font-semibold text-[#2ECC71]">
+                        {formatCurrency(results.dailyProfitThreshold ?? 0)}
+                      </span>{' '}
+                      and you donâ€™t have a consistency rule, so anything above
+                      that is just extra!
+                    </p>
+                  )}
+                  {showMaxDailyProfit && (
+                    <p className="mt-2 text-sm body-text">
+                      Your daily profit target is{' '}
+                      <span className="font-semibold text-[#2ECC71]">
+                        {formatCurrency(results.dailyProfitThreshold ?? 0)}
+                      </span>{' '}
+                      and since you have a consistency rule, make sure you donâ€™t
+                      make any more than{' '}
+                      <span className="font-semibold text-[#2ECC71]">
+                        {formatCurrency(maxDailyProfit)}
+                      </span>{' '}
+                      in a single trading day.
+                    </p>
+                  )}
+                </div>
               )}
-              {emailStatus === 'error' && (
-                <p className="text-xs text-[#D94A4A]">{emailError}</p>
-              )}
-              <button
-                type="button"
-                onClick={handleEmailSubmit}
-                disabled={!results || isEmailSubmitting}
-                className="inline-flex items-center justify-center rounded-full bg-[#1F6FFF] px-6 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-white shadow-lg shadow-[0_20px_60px_rgba(31,111,255,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_70px_rgba(31,111,255,0.45)] disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {isEmailSubmitting ? 'Sending...' : 'Email My Trading Plan'}
-              </button>
             </div>
-          </div>
+          )}
+
         </section>
 
         <section className="glass-panel rounded-3xl p-6 sm:p-8">
@@ -913,16 +826,271 @@ function App() {
               Use these numbers to keep each trade aligned with your firm limits.
             </p>
           </div>
-          {isStale && (
-            <p className="text-xs text-[#D94A4A]">
-              Inputs changed - press Calculate.
-            </p>
-          )}
-          <div className="rounded-2xl border border-dashed border-[#9AA4B2] bg-white px-4 py-8 text-center text-sm text-[#1F6FFF]">
-            {results
-              ? 'Plan details are shown in the email section for comparison.'
-              : 'Enter inputs and press Calculate to see plan details.'}
+
+          <div className="mb-5 flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setRightPanelView('outputs')}
+              className={`rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] transition ${
+                rightPanelView === 'outputs'
+                  ? 'bg-[#1F6FFF] text-white shadow-lg shadow-[0_20px_60px_rgba(31,111,255,0.35)]'
+                  : 'border border-[#1F6FFF] text-[#1F6FFF]'
+              }`}
+            >
+              Risk Outputs
+            </button>
+            <button
+              type="button"
+              onClick={() => setRightPanelView('email')}
+              className={`rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] transition ${
+                rightPanelView === 'email'
+                  ? 'bg-[#1F6FFF] text-white shadow-lg shadow-[0_20px_60px_rgba(31,111,255,0.35)]'
+                  : 'border border-[#1F6FFF] text-[#1F6FFF]'
+              }`}
+            >
+              Email My Trading Plan
+            </button>
           </div>
+
+          {rightPanelView === 'outputs' ? (
+            results ? (
+              <div className="space-y-4 text-sm" aria-disabled={isStale}>
+                {isStale && (
+                  <p className="text-xs text-[#D94A4A]">
+                    Inputs changed - press Calculate.
+                  </p>
+                )}
+                <div className="rounded-2xl bg-white px-4 py-3">
+                  <p className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
+                    Risk management
+                  </p>
+                  <p className="mt-2 text-sm body-text">
+                    Since you trade{' '}
+                    <span className="font-semibold text-[#1F6FFF]">
+                      {asset}
+                    </span>{' '}
+                    and you normally use a{' '}
+                    <span className="font-semibold text-[#1F6FFF]">
+                      {stopTicks}
+                    </span>{' '}
+                    tick stop loss, you should be using{' '}
+                    <span className="font-semibold text-[#1F6FFF]">
+                      {results.suggestedContracts}
+                    </span>{' '}
+                    contracts. This means youâ€™d be risking{' '}
+                    {formatCurrency(results.riskPerTrade)} per trade. With a
+                    Daily Loss Limit of{' '}
+                    <span className="font-semibold text-[#D94A4A]">
+                      {formatCurrency(dailyLossLimitValue)}
+                    </span>
+                    , you could take{' '}
+                    {Math.floor(dailyLossLimitValue / results.riskPerTrade)} full
+                    stop loss hits before stopping for the day.
+                  </p>
+                </div>
+
+                {(!applyConsistencyRule || showMaxDailyProfit) && (
+                  <div className="rounded-2xl bg-white px-4 py-3">
+                    <p className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
+                      Profit goals
+                    </p>
+                    {!applyConsistencyRule && (
+                      <p className="mt-2 text-sm body-text">
+                        Your daily profit target is{' '}
+                        <span className="font-semibold text-[#2ECC71]">
+                          {formatCurrency(results.dailyProfitThreshold ?? 0)}
+                        </span>{' '}
+                        and you donâ€™t have a consistency rule, so anything
+                        above that is just extra!
+                      </p>
+                    )}
+                    {showMaxDailyProfit && (
+                      <p className="mt-2 text-sm body-text">
+                        Your daily profit target is{' '}
+                        <span className="font-semibold text-[#2ECC71]">
+                          {formatCurrency(results.dailyProfitThreshold ?? 0)}
+                        </span>{' '}
+                        and since you have a consistency rule, make sure you donâ€™t
+                        make any more than{' '}
+                        <span className="font-semibold text-[#2ECC71]">
+                          {formatCurrency(maxDailyProfit)}
+                        </span>{' '}
+                        in a single trading day.
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="rounded-2xl border border-dashed border-[#9AA4B2] bg-white px-4 py-8 text-center text-sm text-[#1F6FFF]">
+                Enter inputs and press Calculate to see risk outputs.
+              </div>
+            )
+          ) : (
+            <div
+              className={`rounded-2xl border border-[#9AA4B2] bg-white px-4 py-4 ${
+                hasCalculated ? 'visible' : 'hidden'
+              }`}
+            >
+              <p className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
+                Email my trading plan
+              </p>
+              <div className="mt-3 space-y-3">
+                <input
+                  type="text"
+                  name="full_name"
+                  placeholder="Full name"
+                  value={fullName}
+                  onChange={(event: ValueChangeEvent) => {
+                    setFullName(event.target.value)
+                    markEmailInputsChanged()
+                  }}
+                  className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
+                />
+                <input
+                  type="email"
+                  name="email"
+                  required
+                  placeholder="Email address"
+                  value={email}
+                  onChange={(event: ValueChangeEvent) => {
+                    setEmail(event.target.value)
+                    markEmailInputsChanged()
+                  }}
+                  className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
+                />
+                <label className="flex items-center gap-2 text-sm label-text">
+                  <input
+                    type="checkbox"
+                    name="consent"
+                    required
+                    checked={consentEmail}
+                    onChange={(event) => {
+                      setConsentEmail(event.target.checked)
+                      markEmailInputsChanged()
+                    }}
+                    className="h-4 w-4 rounded border border-[#9AA4B2] text-[#1F6FFF] focus:ring-2 focus:ring-[#1F6FFF]/20"
+                  />
+                  I consent to receive my trading plan by email.
+                </label>
+                <div className="rounded-xl border border-dashed border-[#9AA4B2] bg-white px-3 py-2 helper-text">
+                  <div className="mb-2 uppercase tracking-[0.2em]">
+                    Plan details
+                  </div>
+                  <div className="grid gap-1 sm:grid-cols-2">
+                    <div>
+                      Product:{' '}
+                      <span className="font-semibold text-[#1F6FFF]">
+                        {asset}
+                      </span>
+                    </div>
+                    <div>
+                      Stop loss:{' '}
+                      <span className="font-semibold text-[#1F6FFF]">
+                        {Number(stopTicks)} ticks
+                      </span>
+                    </div>
+                    <div>
+                      Suggested contracts:{' '}
+                      <span className="font-semibold text-[#1F6FFF]">
+                        {results?.suggestedContracts ?? 0}
+                      </span>
+                    </div>
+                    <div>
+                      Risk per trade:{' '}
+                      <span className="font-semibold text-[#1F6FFF]">
+                        {formatCurrency(results?.riskPerTrade ?? 0)}
+                      </span>
+                    </div>
+                    <div>
+                      Profit target:{' '}
+                      <span className="font-semibold text-[#1F6FFF]">
+                        {formatCurrency(Number(profitTarget) || 0)}
+                      </span>
+                    </div>
+                    <div>
+                      Max loss limit:{' '}
+                      <span className="font-semibold text-[#1F6FFF]">
+                        {formatCurrency(Number(maxLoss) || 0)}
+                      </span>
+                    </div>
+                    <div>
+                      Max contract size:{' '}
+                      <span className="font-semibold text-[#1F6FFF]">
+                        {Number(maxContractSize) || 0}
+                      </span>
+                    </div>
+                    <div>
+                      Daily loss limit:{' '}
+                      <span className="font-semibold text-[#1F6FFF]">
+                        {formatCurrency(Number(dailyLossCap) || 0)}
+                      </span>
+                    </div>
+                    <div>
+                      Trades until lost:{' '}
+                      <span className="font-semibold text-[#1F6FFF]">
+                        {Number(tradesToBust) || 0}
+                      </span>
+                    </div>
+                    <div>
+                      Consistency enabled:{' '}
+                      <span className="font-semibold text-[#1F6FFF]">
+                        {applyConsistencyRule ? 'Yes' : 'No'}
+                      </span>
+                    </div>
+                    <div>
+                      Consistency rule:{' '}
+                      <span className="font-semibold text-[#1F6FFF]">
+                        {applyConsistencyRule
+                          ? `${consistencyRule || 0}%`
+                          : 'N/A'}
+                      </span>
+                    </div>
+                    <div>
+                      Max SL hits/day:{' '}
+                      <span className="font-semibold text-[#1F6FFF]">
+                        {results
+                          ? Math.floor(
+                              Number(dailyLossCap) / results.riskPerTrade,
+                            )
+                          : 0}
+                      </span>
+                    </div>
+                    <div>
+                      Daily profit target:{' '}
+                      <span className="font-semibold text-[#1F6FFF]">
+                        {formatCurrency(results?.dailyProfitThreshold ?? 0)}
+                      </span>
+                    </div>
+                    <div>
+                      Max daily profit:{' '}
+                      <span className="font-semibold text-[#1F6FFF]">
+                        {formatCurrency(
+                          applyConsistencyRule ? maxDailyProfit : 0,
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                {emailStatus === 'success' && (
+                  <p className="text-xs text-[#2ECC71]">
+                    Your trading plan has been emailed to you.
+                  </p>
+                )}
+                {emailStatus === 'error' && (
+                  <p className="text-xs text-[#D94A4A]">{emailError}</p>
+                )}
+                <button
+                  type="button"
+                  onClick={handleEmailSubmit}
+                  disabled={!results || isEmailSubmitting}
+                  className="inline-flex items-center justify-center rounded-full bg-[#1F6FFF] px-6 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-white shadow-lg shadow-[0_20px_60px_rgba(31,111,255,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_70px_rgba(31,111,255,0.45)] disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {isEmailSubmitting ? 'Sending...' : 'Email My Trading Plan'}
+                </button>
+              </div>
+            </div>
+          )}
         </section>
       </main>
     </div>
