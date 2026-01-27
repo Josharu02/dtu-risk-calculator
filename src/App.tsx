@@ -921,60 +921,16 @@ function App() {
               Use these numbers to keep each trade aligned with your firm limits.
             </p>
           </div>
-
-          {results ? (
-            <div className="space-y-4 text-sm" aria-disabled={isStale}>
-              {isStale && (
-                <p className="text-xs text-[#D94A4A]">
-                  Inputs changed - press Calculate.
-                </p>
-              )}
-              <div className="rounded-2xl bg-white px-4 py-3">
-                <p className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
-                  Risk management
-                </p>
-                <p className="mt-2 text-sm body-text">
-                  Since you trade <span className="font-semibold text-[#1F6FFF]">{asset}</span> and you normally use a <span className="font-semibold text-[#1F6FFF]">{stopTicks}</span>{' '}
-                  tick stop loss, you should be using{' '}
-                  <span className="font-semibold text-[#1F6FFF]">{results.suggestedContracts}</span> contracts. This means you’d be
-                  risking {formatCurrency(results.riskPerTrade)} per trade. With
-                  a Daily Loss Limit of <span className="font-semibold text-[#D94A4A]">{formatCurrency(dailyLossLimitValue)}</span>,
-                  you could take{' '}
-                  {Math.floor(dailyLossLimitValue / results.riskPerTrade)} full
-                  stop loss hits before stopping for the day.
-                </p>
-              </div>
-
-              {(!applyConsistencyRule || showMaxDailyProfit) && (
-                <div className="rounded-2xl bg-white px-4 py-3">
-                  <p className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
-                    Profit goals
-                  </p>
-                  {!applyConsistencyRule && (
-                    <p className="mt-2 text-sm body-text">
-                      Your daily profit target is{' '}
-                      <span className="font-semibold text-[#2ECC71]">{formatCurrency(results.dailyProfitThreshold ?? 0)}</span> and
-                      you don’t have a consistency rule, so anything above that
-                      is just extra!
-                    </p>
-                  )}
-                  {showMaxDailyProfit && (
-                    <p className="mt-2 text-sm body-text">
-                      Your daily profit target is{' '}
-                      <span className="font-semibold text-[#2ECC71]">{formatCurrency(results.dailyProfitThreshold ?? 0)}</span> and
-                      since you have a consistency rule, make sure you don’t
-                      make any more than <span className="font-semibold text-[#2ECC71]">{formatCurrency(maxDailyProfit)}</span> in a
-                      single trading day.
-                    </p>
-                  )}
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="rounded-2xl border border-dashed border-[#9AA4B2] bg-white px-4 py-8 text-center text-sm text-[#1F6FFF]">
-              Enter inputs and press Calculate to see risk outputs.
-            </div>
+          {isStale && (
+            <p className="text-xs text-[#D94A4A]">
+              Inputs changed - press Calculate.
+            </p>
           )}
+          <div className="rounded-2xl border border-dashed border-[#9AA4B2] bg-white px-4 py-8 text-center text-sm text-[#1F6FFF]">
+            {results
+              ? 'Plan details are shown in the email section for comparison.'
+              : 'Enter inputs and press Calculate to see plan details.'}
+          </div>
         </section>
       </main>
     </div>
@@ -982,4 +938,5 @@ function App() {
 }
 
 export default App
+
 
