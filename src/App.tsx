@@ -270,7 +270,10 @@ function App() {
     setResults(nextResults)
     setIsStale(false)
     setHasCalculated(true)
-    console.log('CALC_STATE_AFTER', { hasCalculated, results })
+    console.log('CALCULATE_DONE', {
+      calculatedFlagValue: true,
+      outputsPreview: nextResults,
+    })
   }
 
   const validateStep = (stepIndex: number) => {
@@ -754,7 +757,7 @@ function App() {
             )}
           </div>
 
-          {hasCalculated && results && (
+          {hasCalculated && (
             <div className="mt-8 space-y-4 text-sm" aria-disabled={isStale}>
               <div className="rounded-2xl bg-white px-4 py-3">
                 <p className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
@@ -769,17 +772,21 @@ function App() {
                   </span>{' '}
                   tick stop loss, you should be using{' '}
                   <span className="font-semibold text-[#1F6FFF]">
-                    {results.suggestedContracts}
+                    {results?.suggestedContracts ?? 0}
                   </span>{' '}
                   contracts. This means youâ€™d be risking{' '}
-                  {formatCurrency(results.riskPerTrade)} per trade. With a Daily
-                  Loss Limit of{' '}
+                  {formatCurrency(results?.riskPerTrade ?? 0)} per trade. With a
+                  Daily Loss Limit of{' '}
                   <span className="font-semibold text-[#D94A4A]">
                     {formatCurrency(dailyLossLimitValue)}
                   </span>
                   , you could take{' '}
-                  {Math.floor(dailyLossLimitValue / results.riskPerTrade)} full
-                  stop loss hits before stopping for the day.
+                  {results
+                    ? Math.floor(
+                        dailyLossLimitValue / results.riskPerTrade,
+                      )
+                    : 0}{' '}
+                  full stop loss hits before stopping for the day.
                 </p>
               </div>
 
@@ -792,7 +799,9 @@ function App() {
                     <p className="mt-2 text-sm body-text">
                       Your daily profit target is{' '}
                       <span className="font-semibold text-[#2ECC71]">
-                        {formatCurrency(results.dailyProfitThreshold ?? 0)}
+                        {formatCurrency(
+                          results?.dailyProfitThreshold ?? 0,
+                        )}
                       </span>{' '}
                       and you donâ€™t have a consistency rule, so anything above
                       that is just extra!
@@ -802,7 +811,9 @@ function App() {
                     <p className="mt-2 text-sm body-text">
                       Your daily profit target is{' '}
                       <span className="font-semibold text-[#2ECC71]">
-                        {formatCurrency(results.dailyProfitThreshold ?? 0)}
+                        {formatCurrency(
+                          results?.dailyProfitThreshold ?? 0,
+                        )}
                       </span>{' '}
                       and since you have a consistency rule, make sure you donâ€™t
                       make any more than{' '}
@@ -855,7 +866,7 @@ function App() {
           </div>
 
           {rightPanelView === 'outputs' ? (
-            hasCalculated && results ? (
+            hasCalculated ? (
               <div className="space-y-4 text-sm" aria-disabled={isStale}>
                 {isStale && (
                   <p className="text-xs text-[#D94A4A]">
@@ -877,17 +888,21 @@ function App() {
                     </span>{' '}
                     tick stop loss, you should be using{' '}
                     <span className="font-semibold text-[#1F6FFF]">
-                      {results.suggestedContracts}
+                      {results?.suggestedContracts ?? 0}
                     </span>{' '}
                     contracts. This means youâ€™d be risking{' '}
-                    {formatCurrency(results.riskPerTrade)} per trade. With a
-                    Daily Loss Limit of{' '}
+                    {formatCurrency(results?.riskPerTrade ?? 0)} per trade. With
+                    a Daily Loss Limit of{' '}
                     <span className="font-semibold text-[#D94A4A]">
                       {formatCurrency(dailyLossLimitValue)}
                     </span>
                     , you could take{' '}
-                    {Math.floor(dailyLossLimitValue / results.riskPerTrade)} full
-                    stop loss hits before stopping for the day.
+                    {results
+                      ? Math.floor(
+                          dailyLossLimitValue / results.riskPerTrade,
+                        )
+                      : 0}{' '}
+                    full stop loss hits before stopping for the day.
                   </p>
                 </div>
 
@@ -900,7 +915,9 @@ function App() {
                       <p className="mt-2 text-sm body-text">
                         Your daily profit target is{' '}
                         <span className="font-semibold text-[#2ECC71]">
-                          {formatCurrency(results.dailyProfitThreshold ?? 0)}
+                          {formatCurrency(
+                            results?.dailyProfitThreshold ?? 0,
+                          )}
                         </span>{' '}
                         and you donâ€™t have a consistency rule, so anything
                         above that is just extra!
@@ -910,7 +927,9 @@ function App() {
                       <p className="mt-2 text-sm body-text">
                         Your daily profit target is{' '}
                         <span className="font-semibold text-[#2ECC71]">
-                          {formatCurrency(results.dailyProfitThreshold ?? 0)}
+                          {formatCurrency(
+                            results?.dailyProfitThreshold ?? 0,
+                          )}
                         </span>{' '}
                         and since you have a consistency rule, make sure you donâ€™t
                         make any more than{' '}
