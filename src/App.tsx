@@ -155,6 +155,7 @@ function App() {
   const handleCalculate = (event?: React.SyntheticEvent) => {
     event?.preventDefault()
     event?.stopPropagation()
+    console.log('CALCULATE_CLICKED')
     setIsStale(false)
     const nextErrors: Errors = {}
     const maxLossValue = Number(maxLoss)
