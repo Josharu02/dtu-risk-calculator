@@ -400,6 +400,7 @@ function App() {
     setEmailStatus('idle')
     setEmailError('')
     setIsEmailSubmitting(true)
+    console.log("EMAIL_PAYLOAD_PREVIEW", calculated)
 
     const payload = {
       full_name: fullName.trim(),
@@ -491,231 +492,303 @@ function App() {
             </p>
           </div>
 
-          <div className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
-            Step {currentStep + 1} of 8
-          </div>
+          {calculated ? (
+            <div className="mt-5 space-y-4 text-sm">
+              <div className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
+                Results
+              </div>
+              <div className="rounded-2xl bg-white px-4 py-3">
+                <p className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
+                  Risk management
+                </p>
+                <p className="mt-2 text-sm body-text">
+                  Since you trade{' '}
+                  <span className="font-semibold text-[#1F6FFF]">
+                    {calculated.product}
+                  </span>{' '}
+                  and you normally use a{' '}
+                  <span className="font-semibold text-[#1F6FFF]">
+                    {calculated.stopLossTicks}
+                  </span>{' '}
+                  tick stop loss, you should be using{' '}
+                  <span className="font-semibold text-[#1F6FFF]">
+                    {calculated.suggestedContracts ?? 0}
+                  </span>{' '}
+                  contracts. This means youÃ¢â‚¬â„¢d be risking{' '}
+                  {formatCurrency(calculated.riskPerTrade ?? 0)} per trade. With
+                  a Daily Loss Limit of{' '}
+                  <span className="font-semibold text-[#D94A4A]">
+                    {formatCurrency(calculated.dailyLossLimit ?? 0)}
+                  </span>
+                  , you could take{' '}
+                  {calculated.maxSlHitsPerDay ?? 0}{' '}
+                  full stop loss hits before stopping for the day.
+                </p>
+              </div>
 
-          <div className="mt-5 space-y-5">
-            {currentStep === 0 && (
-              <div className="space-y-2">
-                <label className="text-sm label-text">
-                  Profit Target ($)
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  value={profitTarget}
-                  onChange={(event: ValueChangeEvent) => {
-                  setProfitTarget(event.target.value)
-                  markCalculatorInputsChanged()
-                }}
-                  className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
-                />
-                {errors.profitTarget && (
-                  <p className="text-xs text-[#D94A4A]">
-                    {errors.profitTarget}
+              {(!calculated.consistencyEnabled ||
+                calculated.maxDailyProfit > 0) && (
+                <div className="rounded-2xl bg-white px-4 py-3">
+                  <p className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
+                    Profit goals
                   </p>
-                )}
+                  {!calculated.consistencyEnabled && (
+                    <p className="mt-2 text-sm body-text">
+                      Your daily profit target is{' '}
+                      <span className="font-semibold text-[#2ECC71]">
+                        {formatCurrency(calculated.dailyProfitTarget ?? 0)}
+                      </span>{' '}
+                      and you donÃ¢â‚¬â„¢t have a consistency rule, so anything
+                      above that is just extra!
+                    </p>
+                  )}
+                  {calculated.consistencyEnabled &&
+                    calculated.maxDailyProfit > 0 && (
+                    <p className="mt-2 text-sm body-text">
+                      Your daily profit target is{' '}
+                      <span className="font-semibold text-[#2ECC71]">
+                        {formatCurrency(calculated.dailyProfitTarget ?? 0)}
+                      </span>{' '}
+                      and since you have a consistency rule, make sure you donÃ¢â‚¬â„¢t
+                      make any more than{' '}
+                      <span className="font-semibold text-[#2ECC71]">
+                        {formatCurrency(calculated.maxDailyProfit ?? 0)}
+                      </span>{' '}
+                      in a single trading day.
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          ) : (
+            <>
+              <div className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
+                Step {currentStep + 1} of 8
               </div>
-            )}
 
-            {currentStep === 1 && (
-              <div className="space-y-2">
-                <label className="text-sm label-text">
-                  Max Loss Limit ($)
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  value={maxLoss}
-                  onChange={(event: ValueChangeEvent) => {
-                  setMaxLoss(event.target.value)
-                  markCalculatorInputsChanged()
-                }}
-                  className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
-                />
-                {errors.maxLoss && (
-                  <p className="text-xs text-[#D94A4A]">{errors.maxLoss}</p>
-                )}
-              </div>
-            )}
-
-            {currentStep === 2 && (
-              <div className="space-y-2">
-                <label className="text-sm label-text">
-                  Max Contract Size
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  value={maxContractSize}
-                  onChange={(event: ValueChangeEvent) => {
-                  setMaxContractSize(event.target.value)
-                  markCalculatorInputsChanged()
-                }}
-                  className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
-                />
-                {errors.maxContractSize && (
-                  <p className="text-xs text-[#D94A4A]">
-                    {errors.maxContractSize}
-                  </p>
-                )}
-              </div>
-            )}
-
-            {currentStep === 3 && (
-              <div className="space-y-2">
-                <label className="text-sm label-text">
-                  Daily Loss Limit ($)
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  value={dailyLossCap}
-                  onChange={(event: ValueChangeEvent) => {
-                  setDailyLossCap(event.target.value)
-                  markCalculatorInputsChanged()
-                }}
-                  className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
-                />
-                {errors.dailyLossCap && (
-                  <p className="text-xs text-[#D94A4A]">
-                    {errors.dailyLossCap}
-                  </p>
-                )}
-              </div>
-            )}
-
-            {currentStep === 4 && (
-              <div className="space-y-2">
-                <label className="text-sm label-text">
-                  Trades until account is lost
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  value={tradesToBust}
-                  onChange={(event: ValueChangeEvent) => {
-                  setTradesToBust(event.target.value)
-                  markCalculatorInputsChanged()
-                }}
-                  className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
-                />
-                {errors.tradesToBust && (
-                  <p className="text-xs text-[#D94A4A]">
-                    {errors.tradesToBust}
-                  </p>
-                )}
-              </div>
-            )}
-
-            {currentStep === 5 && (
-              <div className="space-y-2">
-                <label className="text-sm label-text">
-                  Consistency Rule
-                </label>
-                <label className="flex items-center gap-2 text-sm label-text">
-                  <input
-                    type="checkbox"
-                    checked={applyConsistencyRule}
-                    onChange={(event) => {
-                      const nextValue = event.target.checked
-                      setApplyConsistencyRule(nextValue)
-                    if (!nextValue) {
-                      setConsistencyRule('')
-                    }
-                    markCalculatorInputsChanged()
-                  }}
-                    className="h-4 w-4 rounded border border-[#9AA4B2] text-[#1F6FFF] focus:ring-2 focus:ring-[#1F6FFF]/20"
-                  />
-                  Apply Consistency Rule
-                </label>
-                {applyConsistencyRule && (
-                  <>
-                    <input
-                      type="number"
-                      min="0"
-                      value={consistencyRule}
-                      onChange={(event: ValueChangeEvent) => {
-                        setConsistencyRule(event.target.value)
-                        markCalculatorInputsChanged()
-                      }}
-                      className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
-                    />
-                    {errors.consistencyRule && (
-                      <p className="text-xs text-[#D94A4A]">
-                        {errors.consistencyRule}
-                      </p>
-                    )}
-                  </>
-                )}
-              </div>
-            )}
-
-            {currentStep === 6 && (
-              <div className="space-y-2">
-                <label className="text-sm label-text">
-                  What do you trade?
-                </label>
-                <select
-                  value={asset}
-                  onChange={(event: ValueChangeEvent) => {
-                  setAsset(event.target.value as AssetKey)
-                  markCalculatorInputsChanged()
-                }}
-                  className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
-                >
-                  {Object.keys(TICK_VALUES).map((key) => (
-                    <option key={key} value={key}>
-                      {key}
-                    </option>
-                  ))}
-                  <option value="Custom">Custom ($/tick)</option>
-                </select>
-                {asset === 'Custom' && (
-                  <>
+              <div className="mt-5 space-y-5">
+                {currentStep === 0 && (
+                  <div className="space-y-2">
                     <label className="text-sm label-text">
-                      Tick Value ($/tick)
+                      Profit Target ($)
                     </label>
                     <input
                       type="number"
                       min="0"
-                      value={customTickValue}
+                      value={profitTarget}
                       onChange={(event: ValueChangeEvent) => {
-                        setCustomTickValue(event.target.value)
-                        markCalculatorInputsChanged()
-                      }}
+                      setProfitTarget(event.target.value)
+                      markCalculatorInputsChanged()
+                    }}
                       className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
                     />
-                  </>
+                    {errors.profitTarget && (
+                      <p className="text-xs text-[#D94A4A]">
+                        {errors.profitTarget}
+                      </p>
+                    )}
+                  </div>
                 )}
-                {errors.tickValue && (
-                  <p className="text-xs text-[#D94A4A]">{errors.tickValue}</p>
-                )}
-              </div>
-            )}
 
-            {currentStep === 7 && (
-              <div className="space-y-2">
-                <label className="text-sm label-text">
-                  What size stop loss do you use? (in ticks)
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  value={stopTicks}
-                  onChange={(event: ValueChangeEvent) => {
-                  setStopTicks(event.target.value)
-                  markCalculatorInputsChanged()
-                }}
-                  className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
-                />
-                {errors.stopTicks && (
-                  <p className="text-xs text-[#D94A4A]">{errors.stopTicks}</p>
+                {currentStep === 1 && (
+                  <div className="space-y-2">
+                    <label className="text-sm label-text">
+                      Max Loss Limit ($)
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={maxLoss}
+                      onChange={(event: ValueChangeEvent) => {
+                      setMaxLoss(event.target.value)
+                      markCalculatorInputsChanged()
+                    }}
+                      className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
+                    />
+                    {errors.maxLoss && (
+                      <p className="text-xs text-[#D94A4A]">{errors.maxLoss}</p>
+                    )}
+                  </div>
+                )}
+
+                {currentStep === 2 && (
+                  <div className="space-y-2">
+                    <label className="text-sm label-text">
+                      Max Contract Size
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={maxContractSize}
+                      onChange={(event: ValueChangeEvent) => {
+                      setMaxContractSize(event.target.value)
+                      markCalculatorInputsChanged()
+                    }}
+                      className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
+                    />
+                    {errors.maxContractSize && (
+                      <p className="text-xs text-[#D94A4A]">
+                        {errors.maxContractSize}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {currentStep === 3 && (
+                  <div className="space-y-2">
+                    <label className="text-sm label-text">
+                      Daily Loss Limit ($)
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={dailyLossCap}
+                      onChange={(event: ValueChangeEvent) => {
+                      setDailyLossCap(event.target.value)
+                      markCalculatorInputsChanged()
+                    }}
+                      className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
+                    />
+                    {errors.dailyLossCap && (
+                      <p className="text-xs text-[#D94A4A]">
+                        {errors.dailyLossCap}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {currentStep === 4 && (
+                  <div className="space-y-2">
+                    <label className="text-sm label-text">
+                      Trades until account is lost
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={tradesToBust}
+                      onChange={(event: ValueChangeEvent) => {
+                      setTradesToBust(event.target.value)
+                      markCalculatorInputsChanged()
+                    }}
+                      className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
+                    />
+                    {errors.tradesToBust && (
+                      <p className="text-xs text-[#D94A4A]">
+                        {errors.tradesToBust}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {currentStep === 5 && (
+                  <div className="space-y-2">
+                    <label className="text-sm label-text">
+                      Consistency Rule
+                    </label>
+                    <label className="flex items-center gap-2 text-sm label-text">
+                      <input
+                        type="checkbox"
+                        checked={applyConsistencyRule}
+                        onChange={(event) => {
+                          const nextValue = event.target.checked
+                          setApplyConsistencyRule(nextValue)
+                        if (!nextValue) {
+                          setConsistencyRule('')
+                        }
+                        markCalculatorInputsChanged()
+                      }}
+                        className="h-4 w-4 rounded border border-[#9AA4B2] text-[#1F6FFF] focus:ring-2 focus:ring-[#1F6FFF]/20"
+                      />
+                      Apply Consistency Rule
+                    </label>
+                    {applyConsistencyRule && (
+                      <>
+                        <input
+                          type="number"
+                          min="0"
+                          value={consistencyRule}
+                          onChange={(event: ValueChangeEvent) => {
+                            setConsistencyRule(event.target.value)
+                            markCalculatorInputsChanged()
+                          }}
+                          className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
+                        />
+                        {errors.consistencyRule && (
+                          <p className="text-xs text-[#D94A4A]">
+                            {errors.consistencyRule}
+                          </p>
+                        )}
+                      </>
+                    )}
+                  </div>
+                )}
+
+                {currentStep === 6 && (
+                  <div className="space-y-2">
+                    <label className="text-sm label-text">
+                      What do you trade?
+                    </label>
+                    <select
+                      value={asset}
+                      onChange={(event: ValueChangeEvent) => {
+                      setAsset(event.target.value as AssetKey)
+                      markCalculatorInputsChanged()
+                    }}
+                      className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
+                    >
+                      {Object.keys(TICK_VALUES).map((key) => (
+                        <option key={key} value={key}>
+                          {key}
+                        </option>
+                      ))}
+                      <option value="Custom">Custom ($/tick)</option>
+                    </select>
+                    {asset === 'Custom' && (
+                      <>
+                        <label className="text-sm label-text">
+                          Tick Value ($/tick)
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          value={customTickValue}
+                          onChange={(event: ValueChangeEvent) => {
+                            setCustomTickValue(event.target.value)
+                            markCalculatorInputsChanged()
+                          }}
+                          className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
+                        />
+                      </>
+                    )}
+                    {errors.tickValue && (
+                      <p className="text-xs text-[#D94A4A]">{errors.tickValue}</p>
+                    )}
+                  </div>
+                )}
+
+                {currentStep === 7 && (
+                  <div className="space-y-2">
+                    <label className="text-sm label-text">
+                      What size stop loss do you use? (in ticks)
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={stopTicks}
+                      onChange={(event: ValueChangeEvent) => {
+                      setStopTicks(event.target.value)
+                      markCalculatorInputsChanged()
+                    }}
+                      className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
+                    />
+                    {errors.stopTicks && (
+                      <p className="text-xs text-[#D94A4A]">{errors.stopTicks}</p>
+                    )}
+                  </div>
                 )}
               </div>
-            )}
-          </div>
+            </>
+          )}
 
           <div className="mt-8 flex items-center justify-between">
             <button
