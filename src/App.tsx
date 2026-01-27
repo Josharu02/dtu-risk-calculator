@@ -270,6 +270,7 @@ function App() {
     setResults(nextResults)
     setIsStale(false)
     setHasCalculated(true)
+    console.log('CALC_STATE_AFTER', { hasCalculated, results })
   }
 
   const validateStep = (stepIndex: number) => {
@@ -753,7 +754,7 @@ function App() {
             )}
           </div>
 
-          {results && (
+          {hasCalculated && results && (
             <div className="mt-8 space-y-4 text-sm" aria-disabled={isStale}>
               <div className="rounded-2xl bg-white px-4 py-3">
                 <p className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
@@ -854,7 +855,7 @@ function App() {
           </div>
 
           {rightPanelView === 'outputs' ? (
-            results ? (
+            hasCalculated && results ? (
               <div className="space-y-4 text-sm" aria-disabled={isStale}>
                 {isStale && (
                   <p className="text-xs text-[#D94A4A]">
