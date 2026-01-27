@@ -219,16 +219,25 @@ function App() {
 
     const riskPerTrade = profitTargetValue / tradesUntilLost
     const riskPerContract = stopTicksValue * tickValue
-    const suggestedRaw = profitTargetValue / tradesUntilLost
+    const tradesUntilLostValue = Number(tradesUntilLost)
+    const suggestedRaw =
+      Number.isFinite(profitTargetValue) &&
+      profitTargetValue > 0 &&
+      Number.isFinite(tradesUntilLostValue) &&
+      tradesUntilLostValue > 0
+        ? profitTargetValue / tradesUntilLostValue
+        : 0
     const suggestedRounded = Math.round(suggestedRaw)
-    const suggestedCapped = Math.min(capValue, suggestedRounded)
-    const suggestedContracts = Math.max(1, suggestedCapped)
+    const suggestedContracts = suggestedRounded > 0 ? suggestedRounded : 0
+    const suggestedCapped = Math.min(capValue, suggestedContracts)
 
-    console.log({
-      profitTarget: profitTargetValue,
+    console.log('SUGGESTED_DEBUG', {
+      profitTarget,
       tradesUntilLost,
-      maxContractSize: capValue,
+      profitTargetValue,
+      tradesUntilLostValue,
       suggestedRaw,
+      suggestedRounded,
       suggestedContracts,
     })
     const riskPerTradeTicks = riskPerTrade / tickValue
@@ -246,7 +255,7 @@ function App() {
     const nextResults: Results = {
       riskPerTrade,
       riskPerContract,
-      suggestedContracts,
+      suggestedContracts: suggestedCapped,
       riskPerTradeTicks,
     }
 
