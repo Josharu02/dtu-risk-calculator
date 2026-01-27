@@ -122,6 +122,7 @@ function App() {
   )
   const [emailError, setEmailError] = useState('')
   const [isEmailSubmitting, setIsEmailSubmitting] = useState(false)
+  const isFinalStep = currentStep === 7
 
   const maxContractSizeValue = Number(maxContractSize)
   const tickValue = useMemo(() => {
@@ -273,6 +274,7 @@ function App() {
       maxDailyProfit: maxDailyProfitValue,
     }
     setCalculated(nextCalculated)
+    console.log("CALCULATED_READY", nextCalculated)
     console.log("CALCULATED_SET", nextCalculated)
     console.log("CALCULATE_DONE", {
       calculatedFlagValue: true,
@@ -388,6 +390,8 @@ function App() {
 
   const handleEmailSubmit = async () => {
     if (isEmailSubmitting || !calculated) {
+      setEmailError('Please calculate first.')
+      setEmailStatus('error')
       return
     }
 
@@ -401,6 +405,10 @@ function App() {
     setEmailError('')
     setIsEmailSubmitting(true)
     console.log("EMAIL_PAYLOAD_PREVIEW", calculated)
+    console.log("EMAIL_SEND_ATTEMPT", {
+      isFinalStep,
+      hasCalculated: Boolean(calculated),
+    })
 
     const payload = {
       full_name: fullName.trim(),
@@ -824,6 +832,7 @@ function App() {
             )}
           </div>
 
+          {isFinalStep && (
           <div className="mt-10 rounded-2xl border border-[#9AA4B2] bg-white px-4 py-4">
             <p className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
               Email my trading plan
@@ -965,9 +974,9 @@ function App() {
                   </div>
                 </div>
               ) : (
-                <div className="rounded-2xl border border-dashed border-[#9AA4B2] bg-white px-4 py-6 text-center text-sm text-[#1F6FFF]">
-                  Enter inputs and press Calculate to see plan details.
-                </div>
+                <p className="text-xs text-[#D94A4A]">
+                  Press Calculate to unlock email.
+                </p>
               )}
               {emailStatus === 'success' && (
                 <p className="text-xs text-[#2ECC71]">
@@ -987,6 +996,7 @@ function App() {
               </button>
             </div>
           </div>
+          )}
 
         </section>
 
