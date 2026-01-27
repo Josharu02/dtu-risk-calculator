@@ -117,6 +117,7 @@ function App() {
   const [emailError, setEmailError] = useState('')
   const [isEmailSubmitting, setIsEmailSubmitting] = useState(false)
 
+  const maxContractSizeValue = Number(maxContractSize)
   const tickValue = useMemo(() => {
     if (asset === 'Custom') {
       return Number(customTickValue)
@@ -153,7 +154,6 @@ function App() {
     event?.stopPropagation()
     setIsStale(false)
     const nextErrors: Errors = {}
-    const maxContractSizeValue = Number(maxContractSize)
     const maxLossValue = Number(maxLoss)
     const profitTargetValue = Number(profitTarget)
     const tradesToBustValue = Number(tradesToBust)
@@ -203,7 +203,6 @@ function App() {
     }
 
     const tradesUntilLost = tradesToBustValue
-    const maxContractSizeValue = Number(maxContractSize)
     const capValue = Number.isFinite(maxContractSizeValue)
       ? maxContractSizeValue
       : Number.POSITIVE_INFINITY
@@ -262,7 +261,6 @@ function App() {
 
   const validateStep = (stepIndex: number) => {
     const nextErrors: Errors = {}
-    const maxContractSizeValue = Number(maxContractSize)
     const maxLossValue = Number(maxLoss)
     const profitTargetValue = Number(profitTarget)
     const tradesToBustValue = Number(tradesToBust)
