@@ -270,6 +270,7 @@ function App() {
     setResults(nextResults)
     setIsStale(false)
     setHasCalculated(true)
+    console.log("HAS_CALCULATED_SET_TRUE")
     console.log("CALCULATE_DONE", {
       calculatedFlagValue: true,
       outputsPreview: nextResults,
