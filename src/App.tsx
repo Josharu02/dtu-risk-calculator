@@ -453,15 +453,7 @@ function App() {
 
   const profitTargetValue = Number(profitTarget)
   const consistencyRuleValue = Number(consistencyRule)
-  const showMaxDailyProfit =
-    applyConsistencyRule &&
-    consistencyRule.trim() !== '' &&
-    Number.isFinite(consistencyRuleValue) &&
-    consistencyRuleValue > 0 &&
-    Number.isFinite(profitTargetValue) &&
-    profitTargetValue > 0
   const maxDailyProfit = profitTargetValue * (consistencyRuleValue / 100)
-  const dailyLossLimitValue = Number(dailyLossCap)
 
   return (
     <div className="min-h-screen px-4 pb-16 pt-6 sm:px-6 lg:px-10">
