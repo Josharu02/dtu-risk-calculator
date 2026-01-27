@@ -111,6 +111,7 @@ function App() {
   const [isStale, setIsStale] = useState(false)
   const [currentStep, setCurrentStep] = useState(0)
   const [hasCalculated, setHasCalculated] = useState(false)
+  const [planDetails, setPlanDetails] = useState<any>(null)
   const [emailStatus, setEmailStatus] = useState<'idle' | 'success' | 'error'>(
     'idle',
   )
@@ -163,6 +164,7 @@ function App() {
     const tradesToBustValue = Number(tradesToBust)
     const stopTicksValue = Number(stopTicks)
     const dailyLossCapValue = Number(dailyLossCap)
+    const consistencyRuleValue = Number(consistencyRule)
 
     if (profitTarget.trim() === '') {
       nextErrors.profitTarget = 'Profit Target is required.'
@@ -245,6 +247,9 @@ function App() {
       suggestedContracts,
     })
     const riskPerTradeTicks = riskPerTrade / tickValue
+    const maxDailyProfitValue = applyConsistencyRule
+      ? profitTargetValue * (consistencyRuleValue / 100)
+      : 0
 
     if (riskPerTrade > dailyLossCapValue) {
       setErrors({
@@ -269,6 +274,21 @@ function App() {
     setErrors({})
     setResults(nextResults)
     setIsStale(false)
+    setPlanDetails({
+      product: asset,
+      stopLossTicks: stopTicksValue,
+      suggestedContracts: suggestedCapped,
+      profitTarget: profitTargetValue,
+      maxContractSize: maxContractSizeValue,
+      tradesUntilLost: tradesUntilLostValue,
+      riskPerTrade,
+      maxLossLimit: maxLossValue,
+      dailyLossLimit: dailyLossCapValue,
+      dailyProfitTarget: dailyLossCapValue,
+      maxSlHitsPerDay: Math.floor(dailyLossCapValue / riskPerTrade),
+      consistencyEnabled: applyConsistencyRule,
+      maxDailyProfit: maxDailyProfitValue,
+    })
     setHasCalculated(true)
     console.log("HAS_CALCULATED_SET_TRUE")
     console.log("CALCULATE_DONE", {
@@ -381,10 +401,11 @@ function App() {
     setErrors({})
     setIsStale(false)
     setHasCalculated(false)
+    setPlanDetails(null)
   }
 
   const handleEmailSubmit = async () => {
-    if (isEmailSubmitting || !results) {
+    if (isEmailSubmitting || !planDetails) {
       return
     }
 
@@ -402,22 +423,24 @@ function App() {
       full_name: fullName.trim(),
       email: email.trim(),
       consent: consentEmail,
-      profit_target: Number(profitTarget),
-      max_loss_limit: Number(maxLoss),
-      max_contract_size: Number(maxContractSize),
-      daily_loss_limit: Number(dailyLossCap),
-      trades_until_lost: Number(tradesToBust),
-      consistency_enabled: applyConsistencyRule,
-      consistency_rule: applyConsistencyRule ? consistencyRule.trim() : '',
-      product: asset,
-      stop_loss_ticks: Number(stopTicks),
-      suggested_contracts: results.suggestedContracts,
-      risk_per_trade: results.riskPerTrade,
-      max_sl_hits_per_day: Math.floor(
-        Number(dailyLossCap) / results.riskPerTrade,
-      ),
-      daily_profit_target: results.dailyProfitThreshold ?? 0,
-      max_daily_profit: applyConsistencyRule ? maxDailyProfit : 0,
+      profit_target: planDetails.profitTarget,
+      max_loss_limit: planDetails.maxLossLimit,
+      max_contract_size: planDetails.maxContractSize,
+      daily_loss_limit: planDetails.dailyLossLimit,
+      trades_until_lost: planDetails.tradesUntilLost,
+      consistency_enabled: planDetails.consistencyEnabled,
+      consistency_rule: planDetails.consistencyEnabled
+        ? consistencyRule.trim()
+        : '',
+      product: planDetails.product,
+      stop_loss_ticks: planDetails.stopLossTicks,
+      suggested_contracts: planDetails.suggestedContracts,
+      risk_per_trade: planDetails.riskPerTrade,
+      max_sl_hits_per_day: planDetails.maxSlHitsPerDay ?? 0,
+      daily_profit_target: planDetails.dailyProfitTarget ?? 0,
+      max_daily_profit: planDetails.consistencyEnabled
+        ? planDetails.maxDailyProfit
+        : 0,
     }
 
     try {
@@ -867,7 +890,7 @@ function App() {
           </div>
 
           {rightPanelView === 'outputs' ? (
-            hasCalculated ? (
+            hasCalculated && planDetails ? (
               <div className="space-y-4 text-sm" aria-disabled={isStale}>
                 {isStale && (
                   <p className="text-xs text-[#D94A4A]">
@@ -881,61 +904,55 @@ function App() {
                   <p className="mt-2 text-sm body-text">
                     Since you trade{' '}
                     <span className="font-semibold text-[#1F6FFF]">
-                      {asset}
+                      {planDetails.product}
                     </span>{' '}
                     and you normally use a{' '}
                     <span className="font-semibold text-[#1F6FFF]">
-                      {stopTicks}
+                      {planDetails.stopLossTicks}
                     </span>{' '}
                     tick stop loss, you should be using{' '}
                     <span className="font-semibold text-[#1F6FFF]">
-                      {results?.suggestedContracts ?? 0}
+                      {planDetails.suggestedContracts ?? 0}
                     </span>{' '}
                     contracts. This means youâ€™d be risking{' '}
-                    {formatCurrency(results?.riskPerTrade ?? 0)} per trade. With
-                    a Daily Loss Limit of{' '}
+                    {formatCurrency(planDetails.riskPerTrade ?? 0)} per trade.
+                    With a Daily Loss Limit of{' '}
                     <span className="font-semibold text-[#D94A4A]">
-                      {formatCurrency(dailyLossLimitValue)}
+                      {formatCurrency(planDetails.dailyLossLimit ?? 0)}
                     </span>
                     , you could take{' '}
-                    {results
-                      ? Math.floor(
-                          dailyLossLimitValue / results.riskPerTrade,
-                        )
-                      : 0}{' '}
+                    {planDetails.maxSlHitsPerDay ?? 0}{' '}
                     full stop loss hits before stopping for the day.
                   </p>
                 </div>
 
-                {(!applyConsistencyRule || showMaxDailyProfit) && (
+                {(!planDetails.consistencyEnabled ||
+                  planDetails.maxDailyProfit > 0) && (
                   <div className="rounded-2xl bg-white px-4 py-3">
                     <p className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
                       Profit goals
                     </p>
-                    {!applyConsistencyRule && (
+                    {!planDetails.consistencyEnabled && (
                       <p className="mt-2 text-sm body-text">
                         Your daily profit target is{' '}
                         <span className="font-semibold text-[#2ECC71]">
-                          {formatCurrency(
-                            results?.dailyProfitThreshold ?? 0,
-                          )}
+                          {formatCurrency(planDetails.dailyProfitTarget ?? 0)}
                         </span>{' '}
                         and you donâ€™t have a consistency rule, so anything
                         above that is just extra!
                       </p>
                     )}
-                    {showMaxDailyProfit && (
+                    {planDetails.consistencyEnabled &&
+                      planDetails.maxDailyProfit > 0 && (
                       <p className="mt-2 text-sm body-text">
                         Your daily profit target is{' '}
                         <span className="font-semibold text-[#2ECC71]">
-                          {formatCurrency(
-                            results?.dailyProfitThreshold ?? 0,
-                          )}
+                          {formatCurrency(planDetails.dailyProfitTarget ?? 0)}
                         </span>{' '}
                         and since you have a consistency rule, make sure you donâ€™t
                         make any more than{' '}
                         <span className="font-semibold text-[#2ECC71]">
-                          {formatCurrency(maxDailyProfit)}
+                          {formatCurrency(planDetails.maxDailyProfit ?? 0)}
                         </span>{' '}
                         in a single trading day.
                       </p>
@@ -999,67 +1016,67 @@ function App() {
                     <div>
                       Product:{' '}
                       <span className="font-semibold text-[#1F6FFF]">
-                        {asset}
+                        {planDetails?.product ?? ''}
                       </span>
                     </div>
                     <div>
                       Stop loss:{' '}
                       <span className="font-semibold text-[#1F6FFF]">
-                        {Number(stopTicks)} ticks
+                        {planDetails?.stopLossTicks ?? 0} ticks
                       </span>
                     </div>
                     <div>
                       Suggested contracts:{' '}
                       <span className="font-semibold text-[#1F6FFF]">
-                        {results?.suggestedContracts ?? 0}
+                        {planDetails?.suggestedContracts ?? 0}
                       </span>
                     </div>
                     <div>
                       Risk per trade:{' '}
                       <span className="font-semibold text-[#1F6FFF]">
-                        {formatCurrency(results?.riskPerTrade ?? 0)}
+                        {formatCurrency(planDetails?.riskPerTrade ?? 0)}
                       </span>
                     </div>
                     <div>
                       Profit target:{' '}
                       <span className="font-semibold text-[#1F6FFF]">
-                        {formatCurrency(Number(profitTarget) || 0)}
+                        {formatCurrency(planDetails?.profitTarget ?? 0)}
                       </span>
                     </div>
                     <div>
                       Max loss limit:{' '}
                       <span className="font-semibold text-[#1F6FFF]">
-                        {formatCurrency(Number(maxLoss) || 0)}
+                        {formatCurrency(planDetails?.maxLossLimit ?? 0)}
                       </span>
                     </div>
                     <div>
                       Max contract size:{' '}
                       <span className="font-semibold text-[#1F6FFF]">
-                        {Number(maxContractSize) || 0}
+                        {planDetails?.maxContractSize ?? 0}
                       </span>
                     </div>
                     <div>
                       Daily loss limit:{' '}
                       <span className="font-semibold text-[#1F6FFF]">
-                        {formatCurrency(Number(dailyLossCap) || 0)}
+                        {formatCurrency(planDetails?.dailyLossLimit ?? 0)}
                       </span>
                     </div>
                     <div>
                       Trades until lost:{' '}
                       <span className="font-semibold text-[#1F6FFF]">
-                        {Number(tradesToBust) || 0}
+                        {planDetails?.tradesUntilLost ?? 0}
                       </span>
                     </div>
                     <div>
                       Consistency enabled:{' '}
                       <span className="font-semibold text-[#1F6FFF]">
-                        {applyConsistencyRule ? 'Yes' : 'No'}
+                        {planDetails?.consistencyEnabled ? 'Yes' : 'No'}
                       </span>
                     </div>
                     <div>
                       Consistency rule:{' '}
                       <span className="font-semibold text-[#1F6FFF]">
-                        {applyConsistencyRule
+                        {planDetails?.consistencyEnabled
                           ? `${consistencyRule || 0}%`
                           : 'N/A'}
                       </span>
@@ -1067,24 +1084,22 @@ function App() {
                     <div>
                       Max SL hits/day:{' '}
                       <span className="font-semibold text-[#1F6FFF]">
-                        {results
-                          ? Math.floor(
-                              Number(dailyLossCap) / results.riskPerTrade,
-                            )
-                          : 0}
+                        {planDetails?.maxSlHitsPerDay ?? 0}
                       </span>
                     </div>
                     <div>
                       Daily profit target:{' '}
                       <span className="font-semibold text-[#1F6FFF]">
-                        {formatCurrency(results?.dailyProfitThreshold ?? 0)}
+                        {formatCurrency(planDetails?.dailyProfitTarget ?? 0)}
                       </span>
                     </div>
                     <div>
                       Max daily profit:{' '}
                       <span className="font-semibold text-[#1F6FFF]">
                         {formatCurrency(
-                          applyConsistencyRule ? maxDailyProfit : 0,
+                          planDetails?.consistencyEnabled
+                            ? planDetails?.maxDailyProfit ?? 0
+                            : 0,
                         )}
                       </span>
                     </div>
@@ -1101,7 +1116,7 @@ function App() {
                 <button
                   type="button"
                   onClick={handleEmailSubmit}
-                  disabled={!results || isEmailSubmitting}
+                  disabled={!planDetails || isEmailSubmitting}
                   className="inline-flex items-center justify-center rounded-full bg-[#1F6FFF] px-6 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-white shadow-lg shadow-[0_20px_60px_rgba(31,111,255,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_70px_rgba(31,111,255,0.45)] disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {isEmailSubmitting ? 'Sending...' : 'Email My Trading Plan'}
