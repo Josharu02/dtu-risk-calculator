@@ -126,16 +126,12 @@ function App() {
   const [results, setResults] = useState<Results | null>(null)
   const [isStale, setIsStale] = useState(false)
   const [currentStep, setCurrentStep] = useState(0)
-  const [hasCalculated, setHasCalculated] = useState(false)
   const [planDetails, setPlanDetails] = useState<PlanDetails | null>(null)
   const [emailStatus, setEmailStatus] = useState<'idle' | 'success' | 'error'>(
     'idle',
   )
   const [emailError, setEmailError] = useState('')
   const [isEmailSubmitting, setIsEmailSubmitting] = useState(false)
-  const [rightPanelView, setRightPanelView] = useState<'outputs' | 'email'>(
-    'outputs',
-  )
 
   const maxContractSizeValue = Number(maxContractSize)
   const tickValue = useMemo(() => {
@@ -146,11 +142,8 @@ function App() {
   }, [asset, customTickValue])
 
   const markCalculatorInputsChanged = () => {
-    if (results) {
+    if (planDetails) {
       setIsStale(true)
-    }
-    if (hasCalculated) {
-      setHasCalculated(false)
     }
     if (Object.keys(errors).length > 0) {
       setErrors({})
@@ -306,9 +299,7 @@ function App() {
       maxDailyProfit: maxDailyProfitValue,
     }
     setPlanDetails(nextPlanDetails)
-    setHasCalculated(true)
     console.log("CALCULATE_SET_PLAN_DETAILS", nextPlanDetails)
-    console.log("HAS_CALCULATED_SET_TRUE")
     console.log("CALCULATE_DONE", {
       calculatedFlagValue: true,
       outputsPreview: nextResults,
@@ -418,7 +409,6 @@ function App() {
     setCurrentStep(0)
     setErrors({})
     setIsStale(false)
-    setHasCalculated(false)
     setPlanDetails(null)
   }
 
