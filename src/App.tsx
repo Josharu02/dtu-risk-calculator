@@ -488,7 +488,7 @@ function App() {
         </span>
       </header>
 
-      <main className="mx-auto mt-8 grid w-full max-w-6xl grid-cols-1 gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+      <main className="mx-auto mt-8 grid w-full max-w-6xl grid-cols-1 gap-6">
         <section className="glass-panel rounded-3xl p-6 sm:p-8">
           <div className="mb-6">
             <h2 className="title-font section-title text-2xl sm:text-3xl">
@@ -996,92 +996,7 @@ function App() {
 
         </section>
 
-        <section className="glass-panel rounded-3xl p-6 sm:p-8">
-          <div className="mb-6">
-            <h2 className="title-font section-title text-2xl sm:text-3xl">
-              Risk outputs
-            </h2>
-            <p className="mt-2 text-sm body-text">
-              Use these numbers to keep each trade aligned with your firm limits.
-            </p>
-          </div>
-
-          {calculated ? (
-              <div className="space-y-4 text-sm" aria-disabled={isStale}>
-                {isStale && (
-                  <p className="text-xs text-[#D94A4A]">
-                    Inputs changed - press Calculate.
-                  </p>
-                )}
-                <div className="rounded-2xl bg-white px-4 py-3">
-                  <p className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
-                    Risk management
-                  </p>
-                  <p className="mt-2 text-sm body-text">
-                    Since you trade{' '}
-                    <span className="font-semibold text-[#1F6FFF]">
-                      {calculated.product}
-                    </span>{' '}
-                    and you normally use a{' '}
-                    <span className="font-semibold text-[#1F6FFF]">
-                      {calculated.stopLossTicks}
-                    </span>{' '}
-                    tick stop loss, you should be using{' '}
-                    <span className="font-semibold text-[#1F6FFF]">
-                      {calculated.suggestedContracts ?? 0}
-                    </span>{' '}
-                    contracts. This means youâ€™d be risking{' '}
-                    {formatCurrency(calculated.riskPerTrade ?? 0)} per trade.
-                    With a Daily Loss Limit of{' '}
-                    <span className="font-semibold text-[#D94A4A]">
-                      {formatCurrency(calculated.dailyLossLimit ?? 0)}
-                    </span>
-                    , you could take{' '}
-                    {calculated.maxSlHitsPerDay ?? 0}{' '}
-                    full stop loss hits before stopping for the day.
-                  </p>
-                </div>
-
-                {(!calculated.consistencyEnabled ||
-                  calculated.maxDailyProfit > 0) && (
-                  <div className="rounded-2xl bg-white px-4 py-3">
-                    <p className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
-                      Profit goals
-                    </p>
-                    {!calculated.consistencyEnabled && (
-                      <p className="mt-2 text-sm body-text">
-                        Your daily profit target is{' '}
-                        <span className="font-semibold text-[#2ECC71]">
-                          {formatCurrency(calculated.dailyProfitTarget ?? 0)}
-                        </span>{' '}
-                        and you donâ€™t have a consistency rule, so anything
-                        above that is just extra!
-                      </p>
-                    )}
-                    {calculated.consistencyEnabled &&
-                      calculated.maxDailyProfit > 0 && (
-                      <p className="mt-2 text-sm body-text">
-                        Your daily profit target is{' '}
-                        <span className="font-semibold text-[#2ECC71]">
-                          {formatCurrency(calculated.dailyProfitTarget ?? 0)}
-                        </span>{' '}
-                        and since you have a consistency rule, make sure you donâ€™t
-                        make any more than{' '}
-                        <span className="font-semibold text-[#2ECC71]">
-                          {formatCurrency(calculated.maxDailyProfit ?? 0)}
-                        </span>{' '}
-                        in a single trading day.
-                      </p>
-                    )}
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="rounded-2xl border border-dashed border-[#9AA4B2] bg-white px-4 py-8 text-center text-sm text-[#1F6FFF]">
-                Enter inputs and press Calculate to see risk outputs.
-              </div>
-            )}
-        </section>
+        
       </main>
     </div>
   )
