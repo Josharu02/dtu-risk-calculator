@@ -758,7 +758,7 @@ function App() {
             )}
           </div>
 
-          {hasCalculated && (
+          {results && (
             <div className="mt-8 space-y-4 text-sm" aria-disabled={isStale}>
               <div className="rounded-2xl bg-white px-4 py-3">
                 <p className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
@@ -949,11 +949,7 @@ function App() {
               </div>
             )
           ) : (
-            <div
-              className={`rounded-2xl border border-[#9AA4B2] bg-white px-4 py-4 ${
-                hasCalculated ? 'visible' : 'hidden'
-              }`}
-            >
+            <div className="rounded-2xl border border-[#9AA4B2] bg-white px-4 py-4">
               <p className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
                 Email my trading plan
               </p>
