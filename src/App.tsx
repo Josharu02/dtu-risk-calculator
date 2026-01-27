@@ -114,7 +114,6 @@ function App() {
   const [email, setEmail] = useState('')
   const [consentEmail, setConsentEmail] = useState(false)
   const [errors, setErrors] = useState<Errors>({})
-  const [isStale, setIsStale] = useState(false)
   const [currentStep, setCurrentStep] = useState(0)
   const [calculated, setCalculated] = useState<CalculatedOutputs | null>(null)
   const [emailStatus, setEmailStatus] = useState<'idle' | 'success' | 'error'>(
@@ -133,9 +132,6 @@ function App() {
   }, [asset, customTickValue])
 
   const markCalculatorInputsChanged = () => {
-    if (calculated) {
-      setIsStale(true)
-    }
     if (Object.keys(errors).length > 0) {
       setErrors({})
     }
@@ -157,7 +153,6 @@ function App() {
     event?.preventDefault()
     event?.stopPropagation()
     console.log("CALCULATE_CLICKED")
-    setIsStale(false)
     const nextErrors: Errors = {}
     const maxLossValue = Number(maxLoss)
     const profitTargetValue = Number(profitTarget)
@@ -203,7 +198,6 @@ function App() {
 
     if (Object.keys(nextErrors).length > 0) {
       setErrors(nextErrors)
-      setIsStale(false)
       return
     }
 
@@ -217,7 +211,6 @@ function App() {
         tradesToBust:
           'Trades until account is lost must be at least 1.',
       })
-      setIsStale(false)
       return
     }
 
@@ -252,12 +245,10 @@ function App() {
         dailyLossCap:
           'This is too much risk based on your Daily Loss Limit. You can either raise the DLL or increase the amount of trades taken until account is lost.',
       })
-      setIsStale(false)
       return
     }
 
     setErrors({})
-    setIsStale(false)
     const nextCalculated: CalculatedOutputs = {
       product: asset,
       stopLossTicks: stopTicksValue,
@@ -384,7 +375,6 @@ function App() {
   const handleStartOver = () => {
     setCurrentStep(0)
     setErrors({})
-    setIsStale(false)
     setCalculated(null)
   }
 
