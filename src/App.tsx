@@ -180,9 +180,9 @@ function App() {
   const [errors, setErrors] = useState<Errors>({})
   const [currentStep, setCurrentStep] = useState(0)
   const [calculated, setCalculated] = useState<CalculatedOutputs | null>(null)
-  const [emailStatus, setEmailStatus] = useState<'idle' | 'success' | 'error'>(
-    'idle',
-  )
+  const [emailStatus, setEmailStatus] = useState<
+    'idle' | 'success' | 'error' | 'info'
+  >('idle')
   const [emailError, setEmailError] = useState('')
   const [isEmailSubmitting, setIsEmailSubmitting] = useState(false)
   const maxContractSizeValue = Number(maxContractSize)
@@ -491,7 +491,10 @@ function App() {
     console.log('EMAIL_START_TS', performance.now())
 
     const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 45000)
+    const timeoutId = window.setTimeout(() => {
+      console.log('EMAIL_ABORTED_AFTER_MS', 45000)
+      controller.abort()
+    }, 45000)
 
     try {
       const response = await fetch(requestUrl, {
@@ -536,13 +539,25 @@ function App() {
     } catch (error) {
       console.log('EMAIL_ERROR', error)
       console.log('EMAIL_END_TS', performance.now())
-      if (error) {
+      const isAbort =
+        error instanceof DOMException
+          ? error.name === 'AbortError'
+          : Boolean(
+              error &&
+                typeof error === 'object' &&
+                'name' in error &&
+                (error as { name?: unknown }).name === 'AbortError',
+            ) ||
+            (error instanceof Error &&
+              error.message.toLowerCase().includes('aborted'))
+      if (isAbort) {
         setEmailError(
-          error instanceof DOMException && error.name === 'AbortError'
-            ? 'Email request timed out. Please try again.'
-            : 'Unable to email the plan. Please try again.',
+          'Email is processing — if you don’t see it in 1–2 minutes, check spam and try again.',
         )
+        setEmailStatus('info')
+        return
       }
+      setEmailError('Unable to email the plan. Please try again.')
       setEmailStatus('error')
     } finally {
       clearTimeout(timeoutId)
@@ -853,6 +868,9 @@ function App() {
                 )}
                 {emailStatus === 'error' && (
                   <p className="text-xs text-[#D94A4A]">{emailError}</p>
+                )}
+                {emailStatus === 'info' && (
+                  <p className="text-xs text-[#9AA4B2]">{emailError}</p>
                 )}
                 <button
                   type="button"
