@@ -99,6 +99,70 @@ const formatCurrency = (value: number) =>
     maximumFractionDigits: 2,
   })
 
+const SummaryCards = ({ calculated }: { calculated: CalculatedOutputs }) => (
+  <div className="space-y-4 text-sm">
+    <div className="rounded-2xl bg-white px-4 py-3">
+      <p className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
+        Risk management
+      </p>
+      <p className="mt-2 text-sm body-text">
+        Since you trade{' '}
+        <span className="font-semibold text-[#1F6FFF]">
+          {calculated.product}
+        </span>{' '}
+        and you normally use a{' '}
+        <span className="font-semibold text-[#1F6FFF]">
+          {calculated.stopLossTicks}
+        </span>{' '}
+        tick stop loss, you should be using{' '}
+        <span className="font-semibold text-[#1F6FFF]">
+          {calculated.suggestedContracts ?? 0}
+        </span>{' '}
+        contracts. This means youÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢d be risking{' '}
+        {formatCurrency(calculated.riskPerTrade ?? 0)} per trade. With a Daily
+        Loss Limit of{' '}
+        <span className="font-semibold text-[#D94A4A]">
+          {formatCurrency(calculated.dailyLossLimit ?? 0)}
+        </span>
+        , you could take {calculated.maxSlHitsPerDay ?? 0} full stop loss hits
+        before stopping for the day.
+      </p>
+    </div>
+
+    {(!calculated.consistencyEnabled || calculated.maxDailyProfit > 0) && (
+      <div className="rounded-2xl bg-white px-4 py-3">
+        <p className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
+          Profit goals
+        </p>
+        {!calculated.consistencyEnabled && (
+          <p className="mt-2 text-sm body-text">
+            Your daily profit target is{' '}
+            <span className="font-semibold text-[#2ECC71]">
+              {formatCurrency(calculated.dailyProfitTarget ?? 0)}
+            </span>{' '}
+            and you donÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢t have a consistency rule, so anything above
+            that is just extra!
+          </p>
+        )}
+        {calculated.consistencyEnabled && calculated.maxDailyProfit > 0 && (
+          <p className="mt-2 text-sm body-text">
+            Your daily profit target is{' '}
+            <span className="font-semibold text-[#2ECC71]">
+              {formatCurrency(calculated.dailyProfitTarget ?? 0)}
+            </span>{' '}
+            and since you have a consistency rule, make sure you donÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢t
+            make any more than{' '}
+            <span className="font-semibold text-[#2ECC71]">
+              {formatCurrency(calculated.maxDailyProfit ?? 0)}
+            </span>{' '}
+            in a single trading day.
+          </p>
+        )}
+      </div>
+    )}
+  </div>
+)
+
 function App() {
   const [maxContractSize, setMaxContractSize] = useState('1')
   const [maxLoss, setMaxLoss] = useState('2500')
@@ -494,68 +558,7 @@ function App() {
               <div className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
                 Results
               </div>
-              <div className="rounded-2xl bg-white px-4 py-3">
-                <p className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
-                  Risk management
-                </p>
-                <p className="mt-2 text-sm body-text">
-                  Since you trade{' '}
-                  <span className="font-semibold text-[#1F6FFF]">
-                    {calculated.product}
-                  </span>{' '}
-                  and you normally use a{' '}
-                  <span className="font-semibold text-[#1F6FFF]">
-                    {calculated.stopLossTicks}
-                  </span>{' '}
-                  tick stop loss, you should be using{' '}
-                  <span className="font-semibold text-[#1F6FFF]">
-                    {calculated.suggestedContracts ?? 0}
-                  </span>{' '}
-                  contracts. This means youÃ¢â‚¬â„¢d be risking{' '}
-                  {formatCurrency(calculated.riskPerTrade ?? 0)} per trade. With
-                  a Daily Loss Limit of{' '}
-                  <span className="font-semibold text-[#D94A4A]">
-                    {formatCurrency(calculated.dailyLossLimit ?? 0)}
-                  </span>
-                  , you could take{' '}
-                  {calculated.maxSlHitsPerDay ?? 0}{' '}
-                  full stop loss hits before stopping for the day.
-                </p>
-              </div>
-
-              {(!calculated.consistencyEnabled ||
-                calculated.maxDailyProfit > 0) && (
-                <div className="rounded-2xl bg-white px-4 py-3">
-                  <p className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
-                    Profit goals
-                  </p>
-                  {!calculated.consistencyEnabled && (
-                    <p className="mt-2 text-sm body-text">
-                      Your daily profit target is{' '}
-                      <span className="font-semibold text-[#2ECC71]">
-                        {formatCurrency(calculated.dailyProfitTarget ?? 0)}
-                      </span>{' '}
-                      and you donÃ¢â‚¬â„¢t have a consistency rule, so anything
-                      above that is just extra!
-                    </p>
-                  )}
-                  {calculated.consistencyEnabled &&
-                    calculated.maxDailyProfit > 0 && (
-                    <p className="mt-2 text-sm body-text">
-                      Your daily profit target is{' '}
-                      <span className="font-semibold text-[#2ECC71]">
-                        {formatCurrency(calculated.dailyProfitTarget ?? 0)}
-                      </span>{' '}
-                      and since you have a consistency rule, make sure you donÃ¢â‚¬â„¢t
-                      make any more than{' '}
-                      <span className="font-semibold text-[#2ECC71]">
-                        {formatCurrency(calculated.maxDailyProfit ?? 0)}
-                      </span>{' '}
-                      in a single trading day.
-                    </p>
-                  )}
-                </div>
-              )}
+              <SummaryCards calculated={calculated} />
             </div>
           ) : (
             <>
@@ -574,9 +577,9 @@ function App() {
                       min="0"
                       value={profitTarget}
                       onChange={(event: ValueChangeEvent) => {
-                      setProfitTarget(event.target.value)
-                      markCalculatorInputsChanged()
-                    }}
+                        setProfitTarget(event.target.value)
+                        markCalculatorInputsChanged()
+                      }}
                       className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
                     />
                     {errors.profitTarget && (
@@ -597,9 +600,9 @@ function App() {
                       min="0"
                       value={maxLoss}
                       onChange={(event: ValueChangeEvent) => {
-                      setMaxLoss(event.target.value)
-                      markCalculatorInputsChanged()
-                    }}
+                        setMaxLoss(event.target.value)
+                        markCalculatorInputsChanged()
+                      }}
                       className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
                     />
                     {errors.maxLoss && (
@@ -618,9 +621,9 @@ function App() {
                       min="1"
                       value={maxContractSize}
                       onChange={(event: ValueChangeEvent) => {
-                      setMaxContractSize(event.target.value)
-                      markCalculatorInputsChanged()
-                    }}
+                        setMaxContractSize(event.target.value)
+                        markCalculatorInputsChanged()
+                      }}
                       className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
                     />
                     {errors.maxContractSize && (
@@ -641,9 +644,9 @@ function App() {
                       min="0"
                       value={dailyLossCap}
                       onChange={(event: ValueChangeEvent) => {
-                      setDailyLossCap(event.target.value)
-                      markCalculatorInputsChanged()
-                    }}
+                        setDailyLossCap(event.target.value)
+                        markCalculatorInputsChanged()
+                      }}
                       className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
                     />
                     {errors.dailyLossCap && (
@@ -664,9 +667,9 @@ function App() {
                       min="1"
                       value={tradesToBust}
                       onChange={(event: ValueChangeEvent) => {
-                      setTradesToBust(event.target.value)
-                      markCalculatorInputsChanged()
-                    }}
+                        setTradesToBust(event.target.value)
+                        markCalculatorInputsChanged()
+                      }}
                       className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
                     />
                     {errors.tradesToBust && (
@@ -689,11 +692,11 @@ function App() {
                         onChange={(event) => {
                           const nextValue = event.target.checked
                           setApplyConsistencyRule(nextValue)
-                        if (!nextValue) {
-                          setConsistencyRule('')
-                        }
-                        markCalculatorInputsChanged()
-                      }}
+                          if (!nextValue) {
+                            setConsistencyRule('')
+                          }
+                          markCalculatorInputsChanged()
+                        }}
                         className="h-4 w-4 rounded border border-[#9AA4B2] text-[#1F6FFF] focus:ring-2 focus:ring-[#1F6FFF]/20"
                       />
                       Apply Consistency Rule
@@ -728,9 +731,9 @@ function App() {
                     <select
                       value={asset}
                       onChange={(event: ValueChangeEvent) => {
-                      setAsset(event.target.value as AssetKey)
-                      markCalculatorInputsChanged()
-                    }}
+                        setAsset(event.target.value as AssetKey)
+                        markCalculatorInputsChanged()
+                      }}
                       className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
                     >
                       {Object.keys(TICK_VALUES).map((key) => (
@@ -773,9 +776,9 @@ function App() {
                       min="0"
                       value={stopTicks}
                       onChange={(event: ValueChangeEvent) => {
-                      setStopTicks(event.target.value)
-                      markCalculatorInputsChanged()
-                    }}
+                        setStopTicks(event.target.value)
+                        markCalculatorInputsChanged()
+                      }}
                       className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
                     />
                     {errors.stopTicks && (
@@ -822,170 +825,69 @@ function App() {
           </div>
 
           {isFinalStep && calculated && (
-          <div className="mt-10 rounded-2xl border border-[#9AA4B2] bg-white px-4 py-4">
-            <p className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
-              Email my trading plan
-            </p>
-            <div className="mt-3 space-y-3">
-              <input
-                type="text"
-                name="full_name"
-                placeholder="Full name"
-                value={fullName}
-                onChange={(event: ValueChangeEvent) => {
-                  setFullName(event.target.value)
-                  markEmailInputsChanged()
-                }}
-                className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
-              />
-              <input
-                type="email"
-                name="email"
-                required
-                placeholder="Email address"
-                value={email}
-                onChange={(event: ValueChangeEvent) => {
-                  setEmail(event.target.value)
-                  markEmailInputsChanged()
-                }}
-                className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
-              />
-              <label className="flex items-center gap-2 text-sm label-text">
+            <div className="mt-10 rounded-2xl border border-[#9AA4B2] bg-white px-4 py-4">
+              <p className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
+                Email my trading plan
+              </p>
+              <div className="mt-3 space-y-3">
                 <input
-                  type="checkbox"
-                  name="consent"
-                  required
-                  checked={consentEmail}
-                  onChange={(event) => {
-                    setConsentEmail(event.target.checked)
+                  type="text"
+                  name="full_name"
+                  placeholder="Full name"
+                  value={fullName}
+                  onChange={(event: ValueChangeEvent) => {
+                    setFullName(event.target.value)
                     markEmailInputsChanged()
                   }}
-                  className="h-4 w-4 rounded border border-[#9AA4B2] text-[#1F6FFF] focus:ring-2 focus:ring-[#1F6FFF]/20"
+                  className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
                 />
-                I consent to receive my trading plan by email.
-              </label>
-              {calculated ? (
-                <div className="rounded-xl border border-dashed border-[#9AA4B2] bg-white px-3 py-2 helper-text">
-                  <div className="mb-2 uppercase tracking-[0.2em]">
-                    Plan details
-                  </div>
-                  <div className="grid gap-1 sm:grid-cols-2">
-                    <div>
-                      Product:{' '}
-                      <span className="font-semibold text-[#1F6FFF]">
-                        {calculated.product}
-                      </span>
-                    </div>
-                    <div>
-                      Stop loss:{' '}
-                      <span className="font-semibold text-[#1F6FFF]">
-                        {calculated.stopLossTicks} ticks
-                      </span>
-                    </div>
-                    <div>
-                      Suggested contracts:{' '}
-                      <span className="font-semibold text-[#1F6FFF]">
-                        {calculated.suggestedContracts}
-                      </span>
-                    </div>
-                    <div>
-                      Risk per trade:{' '}
-                      <span className="font-semibold text-[#1F6FFF]">
-                        {formatCurrency(calculated.riskPerTrade)}
-                      </span>
-                    </div>
-                    <div>
-                      Profit target:{' '}
-                      <span className="font-semibold text-[#1F6FFF]">
-                        {formatCurrency(calculated.profitTarget)}
-                      </span>
-                    </div>
-                    <div>
-                      Max loss limit:{' '}
-                      <span className="font-semibold text-[#1F6FFF]">
-                        {formatCurrency(calculated.maxLossLimit)}
-                      </span>
-                    </div>
-                    <div>
-                      Max contract size:{' '}
-                      <span className="font-semibold text-[#1F6FFF]">
-                        {calculated.maxContractSize}
-                      </span>
-                    </div>
-                    <div>
-                      Daily loss limit:{' '}
-                      <span className="font-semibold text-[#1F6FFF]">
-                        {formatCurrency(calculated.dailyLossLimit)}
-                      </span>
-                    </div>
-                    <div>
-                      Trades until lost:{' '}
-                      <span className="font-semibold text-[#1F6FFF]">
-                        {calculated.tradesUntilLost}
-                      </span>
-                    </div>
-                    <div>
-                      Consistency enabled:{' '}
-                      <span className="font-semibold text-[#1F6FFF]">
-                        {calculated.consistencyEnabled ? 'Yes' : 'No'}
-                      </span>
-                    </div>
-                    <div>
-                      Consistency rule:{' '}
-                      <span className="font-semibold text-[#1F6FFF]">
-                        {calculated.consistencyEnabled
-                          ? `${consistencyRule || 0}%`
-                          : 'N/A'}
-                      </span>
-                    </div>
-                    <div>
-                      Max SL hits/day:{' '}
-                      <span className="font-semibold text-[#1F6FFF]">
-                        {calculated.maxSlHitsPerDay}
-                      </span>
-                    </div>
-                    <div>
-                      Daily profit target:{' '}
-                      <span className="font-semibold text-[#1F6FFF]">
-                        {formatCurrency(calculated.dailyProfitTarget)}
-                      </span>
-                    </div>
-                    <div>
-                      Max daily profit:{' '}
-                      <span className="font-semibold text-[#1F6FFF]">
-                        {formatCurrency(
-                          calculated.consistencyEnabled
-                            ? calculated.maxDailyProfit
-                            : 0,
-                        )}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ) : null}
-              {emailStatus === 'success' && (
-                <p className="text-xs text-[#2ECC71]">
-                  Your trading plan has been emailed to you.
-                </p>
-              )}
-              {emailStatus === 'error' && (
-                <p className="text-xs text-[#D94A4A]">{emailError}</p>
-              )}
-              <button
-                type="button"
-                onClick={handleEmailSubmit}
-                disabled={!calculated || isEmailSubmitting}
-                className="inline-flex items-center justify-center rounded-full bg-[#1F6FFF] px-6 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-white shadow-lg shadow-[0_20px_60px_rgba(31,111,255,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_70px_rgba(31,111,255,0.45)] disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {isEmailSubmitting ? 'Sending...' : 'Email My Trading Plan'}
-              </button>
+                <input
+                  type="email"
+                  name="email"
+                  required
+                  placeholder="Email address"
+                  value={email}
+                  onChange={(event: ValueChangeEvent) => {
+                    setEmail(event.target.value)
+                    markEmailInputsChanged()
+                  }}
+                  className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
+                />
+                <label className="flex items-center gap-2 text-sm label-text">
+                  <input
+                    type="checkbox"
+                    name="consent"
+                    required
+                    checked={consentEmail}
+                    onChange={(event) => {
+                      setConsentEmail(event.target.checked)
+                      markEmailInputsChanged()
+                    }}
+                    className="h-4 w-4 rounded border border-[#9AA4B2] text-[#1F6FFF] focus:ring-2 focus:ring-[#1F6FFF]/20"
+                  />
+                  I consent to receive my trading plan by email.
+                </label>
+                <SummaryCards calculated={calculated} />
+                {emailStatus === 'success' && (
+                  <p className="text-xs text-[#2ECC71]">
+                    Your trading plan has been emailed to you.
+                  </p>
+                )}
+                {emailStatus === 'error' && (
+                  <p className="text-xs text-[#D94A4A]">{emailError}</p>
+                )}
+                <button
+                  type="button"
+                  onClick={handleEmailSubmit}
+                  disabled={!calculated || isEmailSubmitting}
+                  className="inline-flex items-center justify-center rounded-full bg-[#1F6FFF] px-6 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-white shadow-lg shadow-[0_20px_60px_rgba(31,111,255,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_70px_rgba(31,111,255,0.45)] disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {isEmailSubmitting ? 'Sending...' : 'Email My Trading Plan'}
+                </button>
+              </div>
             </div>
-          </div>
           )}
-
         </section>
-
-        
       </main>
     </div>
   )
