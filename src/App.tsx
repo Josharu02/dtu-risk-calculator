@@ -785,41 +785,6 @@ function App() {
             )}
           </div>
 
-
-          <div className="mt-8 flex items-center justify-between">
-            <button
-              onClick={handleBack}
-              disabled={currentStep === 0}
-              className="inline-flex items-center justify-center rounded-full bg-[#1F6FFF] px-6 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white shadow-lg shadow-[0_20px_60px_rgba(31,111,255,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_70px_rgba(31,111,255,0.45)] disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              Back
-            </button>
-            {currentStep < 7 ? (
-              <button
-                onClick={handleNext}
-                className="inline-flex items-center justify-center rounded-full bg-[#1F6FFF] px-8 py-3 text-sm font-semibold uppercase tracking-[0.25em] text-white shadow-lg shadow-[0_20px_60px_rgba(31,111,255,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_70px_rgba(31,111,255,0.45)]"
-              >
-                Next
-              </button>
-            ) : (
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={handleStartOver}
-                  className="inline-flex items-center justify-center rounded-full border border-[#1F6FFF] px-6 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#1F6FFF] transition hover:-translate-y-0.5 hover:shadow-[0_24px_70px_rgba(31,111,255,0.25)]"
-                >
-                  Start Over
-                </button>
-                <button
-                  onClick={handleCalculate}
-                  type="button"
-                  className="inline-flex items-center justify-center rounded-full bg-[#1F6FFF] px-8 py-3 text-sm font-semibold uppercase tracking-[0.25em] text-white shadow-lg shadow-[0_20px_60px_rgba(31,111,255,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_70px_rgba(31,111,255,0.45)]"
-                >
-                  CALCULATE
-                </button>
-              </div>
-            )}
-          </div>
-
           {calculated !== null && (
             <div className="mt-10 rounded-2xl border border-[#9AA4B2] bg-white px-4 py-4">
               <p className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
@@ -883,6 +848,40 @@ function App() {
               </div>
             </div>
           )}
+
+          <div className="mt-8 flex items-center justify-between">
+            <button
+              onClick={handleBack}
+              disabled={currentStep === 0}
+              className="inline-flex items-center justify-center rounded-full bg-[#1F6FFF] px-6 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white shadow-lg shadow-[0_20px_60px_rgba(31,111,255,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_70px_rgba(31,111,255,0.45)] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              Back
+            </button>
+            {currentStep < 7 ? (
+              <button
+                onClick={handleNext}
+                className="inline-flex items-center justify-center rounded-full bg-[#1F6FFF] px-8 py-3 text-sm font-semibold uppercase tracking-[0.25em] text-white shadow-lg shadow-[0_20px_60px_rgba(31,111,255,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_70px_rgba(31,111,255,0.45)]"
+              >
+                Next
+              </button>
+            ) : (
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={handleStartOver}
+                  className="inline-flex items-center justify-center rounded-full border border-[#1F6FFF] px-6 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#1F6FFF] transition hover:-translate-y-0.5 hover:shadow-[0_24px_70px_rgba(31,111,255,0.25)]"
+                >
+                  Start Over
+                </button>
+                <button
+                  onClick={handleCalculate}
+                  type="button"
+                  className="inline-flex items-center justify-center rounded-full bg-[#1F6FFF] px-8 py-3 text-sm font-semibold uppercase tracking-[0.25em] text-white shadow-lg shadow-[0_20px_60px_rgba(31,111,255,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_70px_rgba(31,111,255,0.45)]"
+                >
+                  CALCULATE
+                </button>
+              </div>
+            )}
+          </div>
         </section>
       </main>
     </div>
