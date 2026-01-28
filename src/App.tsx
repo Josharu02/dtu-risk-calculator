@@ -555,9 +555,6 @@ function App() {
 
           {calculated ? (
             <div className="mt-5 space-y-4 text-sm">
-              <div className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
-                Results
-              </div>
               <SummaryCards calculated={calculated} />
             </div>
           ) : (
