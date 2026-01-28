@@ -484,6 +484,9 @@ function App() {
         : 0,
     }
 
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 15000)
+
     try {
       const response = await fetch(
         'https://dtu-risk-calculator-api.onrender.com/email-plan',
@@ -493,6 +496,7 @@ function App() {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(payload),
+          signal: controller.signal,
         },
       )
 
@@ -516,10 +520,15 @@ function App() {
       setEmailStatus('success')
     } catch (error) {
       if (error) {
-        setEmailError('Unable to email the plan. Please try again.')
+        setEmailError(
+          error instanceof DOMException && error.name === 'AbortError'
+            ? 'Email request timed out. Please try again.'
+            : 'Unable to email the plan. Please try again.',
+        )
       }
       setEmailStatus('error')
     } finally {
+      clearTimeout(timeoutId)
       setIsEmailSubmitting(false)
     }
   }
