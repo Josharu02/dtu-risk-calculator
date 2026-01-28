@@ -488,9 +488,10 @@ function App() {
     const requestUrl = 'https://dtu-risk-calculator-api.onrender.com/email-plan'
     console.log('EMAIL_REQUEST_URL', requestUrl)
     console.log('EMAIL_PAYLOAD', payload)
+    console.log('EMAIL_START_TS', performance.now())
 
     const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 30000)
+    const timeoutId = setTimeout(() => controller.abort(), 45000)
 
     try {
       const response = await fetch(requestUrl, {
@@ -502,16 +503,24 @@ function App() {
         signal: controller.signal,
       })
 
-      const responseBody = await response.text()
       console.log('EMAIL_RESPONSE_STATUS', response.status)
-      console.log('EMAIL_RESPONSE_BODY', responseBody)
+      const responseBody = await response.text()
+      let data: unknown = null
+      try {
+        data = responseBody ? JSON.parse(responseBody) : null
+      } catch (error) {
+        if (error) {
+          data = null
+        }
+      }
+      console.log('EMAIL_RESPONSE_BODY', data)
+      console.log('EMAIL_END_TS', performance.now())
 
       if (!response.ok) {
         let message = 'Unable to email the plan. Please try again.'
         try {
-          const data = responseBody ? JSON.parse(responseBody) : null
-          if (data?.message) {
-            message = data.message
+          if (data && typeof data === 'object' && 'message' in data) {
+            message = String((data as { message?: unknown }).message ?? message)
           }
         } catch (error) {
           if (error) {
@@ -526,6 +535,7 @@ function App() {
       setEmailStatus('success')
     } catch (error) {
       console.log('EMAIL_ERROR', error)
+      console.log('EMAIL_END_TS', performance.now())
       if (error) {
         setEmailError(
           error instanceof DOMException && error.name === 'AbortError'
