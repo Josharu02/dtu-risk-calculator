@@ -260,6 +260,21 @@ function App() {
 
     if (Object.keys(nextErrors).length > 0) {
       setErrors(nextErrors)
+      const firstErrorStep = (
+        [
+          ['profitTarget', 0],
+          ['maxLoss', 1],
+          ['maxContractSize', 2],
+          ['dailyLossCap', 3],
+          ['tradesToBust', 4],
+          ['consistencyRule', 5],
+          ['tickValue', 6],
+          ['stopTicks', 7],
+        ] as const
+      ).find(([key]) => Boolean(nextErrors[key]))?.[1]
+      if (firstErrorStep !== undefined) {
+        setCurrentStep(firstErrorStep)
+      }
       return
     }
 
@@ -307,6 +322,7 @@ function App() {
         dailyLossCap:
           'This is too much risk based on your Daily Loss Limit. You can either raise the DLL or increase the amount of trades taken until account is lost.',
       })
+      setCurrentStep(3)
       return
     }
 
