@@ -776,11 +776,6 @@ function App() {
             )}
           </div>
 
-          {calculated !== null && (
-            <div className="mt-6 space-y-4 text-sm">
-              <SummaryCards calculated={calculated} />
-            </div>
-          )}
 
           <div className="mt-8 flex items-center justify-between">
             <button
