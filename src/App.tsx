@@ -446,6 +446,13 @@ function App() {
 
   const handleStartOver = () => {
     setCurrentStep(0)
+    setCalculated(null)
+    setFullName('')
+    setEmail('')
+    setConsentEmail(false)
+    setEmailStatus('idle')
+    setEmailError('')
+    setIsEmailSubmitting(false)
     setErrors({})
   }
 
@@ -827,7 +834,7 @@ function App() {
             )}
           </div>
 
-          {calculated !== null && (
+          {currentStep === 7 && calculated !== null && (
             <div className="mt-10 space-y-6">
               <SummaryCards calculated={calculated} />
               <div className="rounded-2xl border border-[#9AA4B2] bg-white px-4 py-4">
