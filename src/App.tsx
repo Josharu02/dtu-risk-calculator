@@ -440,6 +440,7 @@ function App() {
   }
 
   const handleEmailSubmit = async () => {
+    console.log('EMAIL_CLICKED')
     if (isEmailSubmitting || !calculated) {
       setEmailError('Please calculate first.')
       setEmailStatus('error')
@@ -484,26 +485,31 @@ function App() {
         : 0,
     }
 
+    const requestUrl = 'https://dtu-risk-calculator-api.onrender.com/email-plan'
+    console.log('EMAIL_REQUEST_URL', requestUrl)
+    console.log('EMAIL_PAYLOAD', payload)
+
     const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 15000)
+    const timeoutId = setTimeout(() => controller.abort(), 30000)
 
     try {
-      const response = await fetch(
-        'https://dtu-risk-calculator-api.onrender.com/email-plan',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(payload),
-          signal: controller.signal,
+      const response = await fetch(requestUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      )
+        body: JSON.stringify(payload),
+        signal: controller.signal,
+      })
+
+      const responseBody = await response.text()
+      console.log('EMAIL_RESPONSE_STATUS', response.status)
+      console.log('EMAIL_RESPONSE_BODY', responseBody)
 
       if (!response.ok) {
         let message = 'Unable to email the plan. Please try again.'
         try {
-          const data = await response.json()
+          const data = responseBody ? JSON.parse(responseBody) : null
           if (data?.message) {
             message = data.message
           }
@@ -519,6 +525,7 @@ function App() {
 
       setEmailStatus('success')
     } catch (error) {
+      console.log('EMAIL_ERROR', error)
       if (error) {
         setEmailError(
           error instanceof DOMException && error.name === 'AbortError'
