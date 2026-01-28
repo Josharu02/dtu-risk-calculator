@@ -115,7 +115,7 @@ function App() {
   const [consentEmail, setConsentEmail] = useState(false)
   const [errors, setErrors] = useState<Errors>({})
   const [currentStep, setCurrentStep] = useState(0)
-  const [calculated, setCalculated] = useState<CalculatedOutputs | null>(null)
+  const [calculated, setCalculated] = useState<null | any>(null)
   const [emailStatus, setEmailStatus] = useState<'idle' | 'success' | 'error'>(
     'idle',
   )
@@ -265,8 +265,7 @@ function App() {
       maxDailyProfit: maxDailyProfitValue,
     }
     setCalculated(nextCalculated)
-    console.log("CALCULATED_READY", nextCalculated)
-    console.log("CALCULATED_SET", nextCalculated)
+    console.log("CALCULATE_SET", nextCalculated)
     console.log("CALCULATE_DONE", {
       calculatedFlagValue: true,
       outputsPreview: nextCalculated,
