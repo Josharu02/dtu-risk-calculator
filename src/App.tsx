@@ -118,7 +118,7 @@ const SummaryCards = ({ calculated }: { calculated: CalculatedOutputs }) => (
         <span className="font-semibold text-[#1F6FFF]">
           {calculated.suggestedContracts ?? 0}
         </span>{' '}
-        contracts. This means youÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢d be risking{' '}
+        contracts. This means you&apos;d be risking{' '}
         {formatCurrency(calculated.riskPerTrade ?? 0)} per trade. With a Daily
         Loss Limit of{' '}
         <span className="font-semibold text-[#D94A4A]">
@@ -140,7 +140,7 @@ const SummaryCards = ({ calculated }: { calculated: CalculatedOutputs }) => (
             <span className="font-semibold text-[#2ECC71]">
               {formatCurrency(calculated.dailyProfitTarget ?? 0)}
             </span>{' '}
-            and you donÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢t have a consistency rule, so anything above
+            and you don&apos;t have a consistency rule, so anything above
             that is just extra!
           </p>
         )}
@@ -150,7 +150,7 @@ const SummaryCards = ({ calculated }: { calculated: CalculatedOutputs }) => (
             <span className="font-semibold text-[#2ECC71]">
               {formatCurrency(calculated.dailyProfitTarget ?? 0)}
             </span>{' '}
-            and since you have a consistency rule, make sure you donÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢t
+            and since you have a consistency rule, make sure you don&apos;t
             make any more than{' '}
             <span className="font-semibold text-[#2ECC71]">
               {formatCurrency(calculated.maxDailyProfit ?? 0)}
