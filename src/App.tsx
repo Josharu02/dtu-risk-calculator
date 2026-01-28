@@ -179,14 +179,12 @@ function App() {
   const [consentEmail, setConsentEmail] = useState(false)
   const [errors, setErrors] = useState<Errors>({})
   const [currentStep, setCurrentStep] = useState(0)
-  const [calculated, setCalculated] = useState<null | any>(null)
+  const [calculated, setCalculated] = useState<CalculatedOutputs | null>(null)
   const [emailStatus, setEmailStatus] = useState<'idle' | 'success' | 'error'>(
     'idle',
   )
   const [emailError, setEmailError] = useState('')
   const [isEmailSubmitting, setIsEmailSubmitting] = useState(false)
-  const isFinalStep = currentStep === 7
-
   const maxContractSizeValue = Number(maxContractSize)
   const tickValue = useMemo(() => {
     if (asset === 'Custom') {
@@ -459,7 +457,6 @@ function App() {
     setIsEmailSubmitting(true)
     console.log("EMAIL_PAYLOAD_PREVIEW", calculated)
     console.log("EMAIL_SEND_ATTEMPT", {
-      isFinalStep,
       hasCalculated: Boolean(calculated),
     })
 
@@ -821,7 +818,7 @@ function App() {
             )}
           </div>
 
-          {isFinalStep && calculated && (
+          {calculated !== null && (
             <div className="mt-10 rounded-2xl border border-[#9AA4B2] bg-white px-4 py-4">
               <p className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
                 Email my trading plan
