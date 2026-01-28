@@ -326,8 +326,7 @@ function App() {
       return
     }
 
-    setErrors({})
-    const nextCalculated: CalculatedOutputs = {
+    const computedOutputs: CalculatedOutputs = {
       product: asset,
       stopLossTicks: stopTicksValue,
       suggestedContracts: suggestedCapped,
@@ -342,12 +341,8 @@ function App() {
       consistencyEnabled: applyConsistencyRule,
       maxDailyProfit: maxDailyProfitValue,
     }
-    setCalculated(nextCalculated)
-    console.log("CALCULATE_SET", nextCalculated)
-    console.log("CALCULATE_DONE", {
-      calculatedFlagValue: true,
-      outputsPreview: nextCalculated,
-    })
+    setCalculated(computedOutputs)
+    console.log("CALCULATE_SET_CALCULATED", computedOutputs)
   }
 
   const validateStep = (stepIndex: number) => {
@@ -452,7 +447,6 @@ function App() {
   const handleStartOver = () => {
     setCurrentStep(0)
     setErrors({})
-    setCalculated(null)
   }
 
   const handleEmailSubmit = async () => {
@@ -834,68 +828,70 @@ function App() {
           </div>
 
           {calculated !== null && (
-            <div className="mt-10 rounded-2xl border border-[#9AA4B2] bg-white px-4 py-4">
-              <p className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
-                Email my trading plan
-              </p>
-              <div className="mt-3 space-y-3">
-                <input
-                  type="text"
-                  name="full_name"
-                  placeholder="Full name"
-                  value={fullName}
-                  onChange={(event: ValueChangeEvent) => {
-                    setFullName(event.target.value)
-                    markEmailInputsChanged()
-                  }}
-                  className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
-                />
-                <input
-                  type="email"
-                  name="email"
-                  required
-                  placeholder="Email address"
-                  value={email}
-                  onChange={(event: ValueChangeEvent) => {
-                    setEmail(event.target.value)
-                    markEmailInputsChanged()
-                  }}
-                  className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
-                />
-                <label className="flex items-center gap-2 text-sm label-text">
+            <div className="mt-10 space-y-6">
+              <SummaryCards calculated={calculated} />
+              <div className="rounded-2xl border border-[#9AA4B2] bg-white px-4 py-4">
+                <p className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
+                  Email my trading plan
+                </p>
+                <div className="mt-3 space-y-3">
                   <input
-                    type="checkbox"
-                    name="consent"
-                    required
-                    checked={consentEmail}
-                    onChange={(event) => {
-                      setConsentEmail(event.target.checked)
+                    type="text"
+                    name="full_name"
+                    placeholder="Full name"
+                    value={fullName}
+                    onChange={(event: ValueChangeEvent) => {
+                      setFullName(event.target.value)
                       markEmailInputsChanged()
                     }}
-                    className="h-4 w-4 rounded border border-[#9AA4B2] text-[#1F6FFF] focus:ring-2 focus:ring-[#1F6FFF]/20"
+                    className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
                   />
-                  I consent to receive my trading plan by email.
-                </label>
-                <SummaryCards calculated={calculated} />
-                {emailStatus === 'success' && (
-                  <p className="text-xs text-[#2ECC71]">
-                    Your trading plan has been emailed to you.
-                  </p>
-                )}
-                {emailStatus === 'error' && (
-                  <p className="text-xs text-[#D94A4A]">{emailError}</p>
-                )}
-                {emailStatus === 'info' && (
-                  <p className="text-xs text-[#9AA4B2]">{emailError}</p>
-                )}
-                <button
-                  type="button"
-                  onClick={handleEmailSubmit}
-                  disabled={!calculated || isEmailSubmitting}
-                  className="inline-flex items-center justify-center rounded-full bg-[#1F6FFF] px-6 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-white shadow-lg shadow-[0_20px_60px_rgba(31,111,255,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_70px_rgba(31,111,255,0.45)] disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {isEmailSubmitting ? 'Sending...' : 'Email My Trading Plan'}
-                </button>
+                  <input
+                    type="email"
+                    name="email"
+                    required
+                    placeholder="Email address"
+                    value={email}
+                    onChange={(event: ValueChangeEvent) => {
+                      setEmail(event.target.value)
+                      markEmailInputsChanged()
+                    }}
+                    className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
+                  />
+                  <label className="flex items-center gap-2 text-sm label-text">
+                    <input
+                      type="checkbox"
+                      name="consent"
+                      required
+                      checked={consentEmail}
+                      onChange={(event) => {
+                        setConsentEmail(event.target.checked)
+                        markEmailInputsChanged()
+                      }}
+                      className="h-4 w-4 rounded border border-[#9AA4B2] text-[#1F6FFF] focus:ring-2 focus:ring-[#1F6FFF]/20"
+                    />
+                    I consent to receive my trading plan by email.
+                  </label>
+                  {emailStatus === 'success' && (
+                    <p className="text-xs text-[#2ECC71]">
+                      Your trading plan has been emailed to you.
+                    </p>
+                  )}
+                  {emailStatus === 'error' && (
+                    <p className="text-xs text-[#D94A4A]">{emailError}</p>
+                  )}
+                  {emailStatus === 'info' && (
+                    <p className="text-xs text-[#9AA4B2]">{emailError}</p>
+                  )}
+                  <button
+                    type="button"
+                    onClick={handleEmailSubmit}
+                    disabled={!calculated || isEmailSubmitting}
+                    className="inline-flex items-center justify-center rounded-full bg-[#1F6FFF] px-6 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-white shadow-lg shadow-[0_20px_60px_rgba(31,111,255,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_70px_rgba(31,111,255,0.45)] disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {isEmailSubmitting ? 'Sending...' : 'Email My Trading Plan'}
+                  </button>
+                </div>
               </div>
             </div>
           )}
