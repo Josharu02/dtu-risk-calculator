@@ -100,13 +100,23 @@ const formatCurrency = (value: number) =>
     maximumFractionDigits: 2,
   })
 
-const SummaryCards = ({ calculated }: { calculated: CalculatedOutputs }) => {
+const SummaryCards = ({
+  calculated,
+  isFinalStep,
+}: {
+  calculated: CalculatedOutputs
+  isFinalStep: boolean
+}) => {
   const isCapped =
     calculated.suggestedContractsRaw > calculated.maxContractSize
 
   return (
-    <div className="space-y-4 text-sm">
-      <div className="rounded-2xl bg-white px-4 py-3">
+    <div className={`text-sm ${isFinalStep ? 'space-y-3' : 'space-y-4'}`}>
+      <div
+        className={`rounded-2xl bg-white px-4 ${
+          isFinalStep ? 'py-2.5' : 'py-3'
+        }`}
+      >
         <p className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
           Risk management
         </p>
@@ -147,7 +157,11 @@ const SummaryCards = ({ calculated }: { calculated: CalculatedOutputs }) => {
       </div>
 
     {(!calculated.consistencyEnabled || calculated.maxDailyProfit > 0) && (
-      <div className="rounded-2xl bg-white px-4 py-3">
+      <div
+        className={`rounded-2xl bg-white px-4 ${
+          isFinalStep ? 'py-2.5' : 'py-3'
+        }`}
+      >
         <p className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
           Profit goals
         </p>
@@ -850,9 +864,20 @@ function App() {
           </div>
 
           {currentStep === 7 && calculated !== null && (
-            <div className="mt-10 space-y-6">
-              <SummaryCards calculated={calculated} />
-              <div className="rounded-2xl border border-[#9AA4B2] bg-white px-4 py-4">
+            <div
+              className={`${
+                currentStep === 7 ? 'mt-8 space-y-4' : 'mt-10 space-y-6'
+              }`}
+            >
+              <SummaryCards
+                calculated={calculated}
+                isFinalStep={currentStep === 7}
+              />
+              <div
+                className={`rounded-2xl border border-[#9AA4B2] bg-white px-4 ${
+                  currentStep === 7 ? 'py-3' : 'py-4'
+                }`}
+              >
                 <p className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
                   Email my trading plan
                 </p>
