@@ -1,29 +1,36 @@
 import { useMemo, useState } from 'react'
 
-const TICK_VALUES = {
+const TICK_VALUE_PER_TICK = {
   ES: 12.5,
   MES: 1.25,
   NQ: 5,
   MNQ: 0.5,
   RTY: 5,
   M2K: 0.5,
+  YM: 5,
+  MYM: 0.5,
   NKD: 25,
   MBT: 0.5,
-  MET: 0.25,
-  '6A': 10,
+  MET: 0.05,
+  '6A': 5,
   '6B': 6.25,
-  '6C': 10,
+  '6C': 5,
   '6E': 6.25,
   '6J': 6.25,
-  '6S': 12.5,
-  E7: 6.25,
+  '6S': 6.25,
+  E7: 6.35,
   M6E: 1.25,
   M6A: 1,
   '6M': 5,
-  '6N': 10,
+  '6N': 5,
   M6B: 0.625,
-  HE: 10,
   LE: 10,
+  HE: 10,
+  ZC: 12.5,
+  ZW: 12.5,
+  ZS: 12.5,
+  ZM: 10,
+  ZL: 6,
   CL: 10,
   QM: 12.5,
   NG: 10,
@@ -32,15 +39,8 @@ const TICK_VALUES = {
   RB: 4.2,
   HO: 4.2,
   PL: 5,
-  MNG: 2.5,
-  ZC: 12.5,
-  ZW: 12.5,
-  ZS: 12.5,
-  ZM: 10,
-  ZL: 6,
-  YM: 5,
-  MYM: 0.5,
-  ZT: 15.625,
+  MNG: 1,
+  ZT: 7.8125,
   ZF: 7.8125,
   ZN: 15.625,
   TN: 15.625,
@@ -54,7 +54,7 @@ const TICK_VALUES = {
   MHG: 1.25,
 } as const
 
-type AssetKey = keyof typeof TICK_VALUES | 'Custom'
+type AssetKey = keyof typeof TICK_VALUE_PER_TICK | 'Custom'
 
 type Errors = Partial<
   Record<
@@ -222,7 +222,7 @@ function App() {
     if (asset === 'Custom') {
       return Number(customTickValue)
     }
-    return TICK_VALUES[asset]
+    return TICK_VALUE_PER_TICK[asset] ?? 0
   }, [asset, customTickValue])
 
   const markCalculatorInputsChanged = () => {
@@ -279,7 +279,9 @@ function App() {
       nextErrors.stopTicks = 'Stop loss size must be greater than 0.'
     }
 
-    if (!Number.isFinite(tickValue) || tickValue <= 0) {
+    if (asset !== 'Custom' && !(asset in TICK_VALUE_PER_TICK)) {
+      nextErrors.tickValue = 'Tick value is missing for the selected product.'
+    } else if (!Number.isFinite(tickValue) || tickValue <= 0) {
       nextErrors.tickValue = 'Tick value must be greater than 0.'
     }
 
@@ -440,7 +442,10 @@ function App() {
         }
         break
       case 6:
-        if (!Number.isFinite(tickValue) || tickValue <= 0) {
+        if (asset !== 'Custom' && !(asset in TICK_VALUE_PER_TICK)) {
+          nextErrors.tickValue =
+            'Tick value is missing for the selected product.'
+        } else if (!Number.isFinite(tickValue) || tickValue <= 0) {
           nextErrors.tickValue = 'Tick value must be greater than 0.'
         }
         break
@@ -812,7 +817,7 @@ function App() {
                   }}
                   className="w-full rounded-xl border border-[#9AA4B2] bg-white px-4 py-3 text-base text-[#1F6FFF] shadow-sm focus:border-[#1F6FFF] focus:outline-none focus:ring-2 focus:ring-[#1F6FFF]/20"
                 >
-                  {Object.keys(TICK_VALUES).map((key) => (
+                  {Object.keys(TICK_VALUE_PER_TICK).map((key) => (
                     <option key={key} value={key}>
                       {key}
                     </option>
