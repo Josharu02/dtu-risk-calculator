@@ -74,6 +74,7 @@ type CalculatedOutputs = {
   product: AssetKey
   stopLossTicks: number
   suggestedContracts: number
+  suggestedContractsRaw: number
   profitTarget: number
   maxContractSize: number
   tradesUntilLost: number
@@ -99,35 +100,51 @@ const formatCurrency = (value: number) =>
     maximumFractionDigits: 2,
   })
 
-const SummaryCards = ({ calculated }: { calculated: CalculatedOutputs }) => (
-  <div className="space-y-4 text-sm">
-    <div className="rounded-2xl bg-white px-4 py-3">
-      <p className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
-        Risk management
-      </p>
-      <p className="mt-2 text-sm body-text">
-        Since you trade{' '}
-        <span className="font-semibold text-[#1F6FFF]">
-          {calculated.product}
-        </span>{' '}
-        and you normally use a{' '}
-        <span className="font-semibold text-[#1F6FFF]">
-          {calculated.stopLossTicks}
-        </span>{' '}
-        tick stop loss, you should be using{' '}
-        <span className="font-semibold text-[#1F6FFF]">
-          {calculated.suggestedContracts ?? 0}
-        </span>{' '}
-        contracts. This means you&apos;d be risking{' '}
-        {formatCurrency(calculated.riskPerTrade ?? 0)} per trade. With a Daily
-        Loss Limit of{' '}
-        <span className="font-semibold text-[#D94A4A]">
-          {formatCurrency(calculated.dailyLossLimit ?? 0)}
-        </span>
-        , you could take {calculated.maxSlHitsPerDay ?? 0} full stop loss hits
-        before stopping for the day.
-      </p>
-    </div>
+const SummaryCards = ({ calculated }: { calculated: CalculatedOutputs }) => {
+  const isCapped =
+    calculated.suggestedContractsRaw > calculated.maxContractSize
+
+  return (
+    <div className="space-y-4 text-sm">
+      <div className="rounded-2xl bg-white px-4 py-3">
+        <p className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
+          Risk management
+        </p>
+        <p className="mt-2 text-sm body-text">
+          Suggested Contracts:{' '}
+          <span className="font-semibold text-[#1F6FFF]">
+            {calculated.suggestedContractsRaw}
+          </span>
+          {isCapped && (
+            <span className="font-semibold text-[#1F6FFF]">
+              {' '}
+              (capped at {calculated.maxContractSize} max)
+            </span>
+          )}
+        </p>
+        <p className="mt-2 text-sm body-text">
+          Since you trade{' '}
+          <span className="font-semibold text-[#1F6FFF]">
+            {calculated.product}
+          </span>{' '}
+          and you normally use a{' '}
+          <span className="font-semibold text-[#1F6FFF]">
+            {calculated.stopLossTicks}
+          </span>{' '}
+          tick stop loss, you should be using{' '}
+          <span className="font-semibold text-[#1F6FFF]">
+            {calculated.suggestedContracts ?? 0}
+          </span>{' '}
+          contracts. This means you&apos;d be risking{' '}
+          {formatCurrency(calculated.riskPerTrade ?? 0)} per trade. With a Daily
+          Loss Limit of{' '}
+          <span className="font-semibold text-[#D94A4A]">
+            {formatCurrency(calculated.dailyLossLimit ?? 0)}
+          </span>
+          , you could take {calculated.maxSlHitsPerDay ?? 0} full stop loss hits
+          before stopping for the day.
+        </p>
+      </div>
 
     {(!calculated.consistencyEnabled || calculated.maxDailyProfit > 0) && (
       <div className="rounded-2xl bg-white px-4 py-3">
@@ -161,7 +178,8 @@ const SummaryCards = ({ calculated }: { calculated: CalculatedOutputs }) => (
       </div>
     )}
   </div>
-)
+  )
+}
 
 function App() {
   const [maxContractSize, setMaxContractSize] = useState('1')
@@ -291,27 +309,21 @@ function App() {
       return
     }
 
-    const riskPerTrade = profitTargetValue / tradesUntilLost
     const tradesUntilLostValue = Number(tradesUntilLost)
-    const suggestedRaw =
-      Number.isFinite(profitTargetValue) &&
-      profitTargetValue > 0 &&
-      Number.isFinite(tradesUntilLostValue) &&
-      tradesUntilLostValue > 0
-        ? profitTargetValue / tradesUntilLostValue
-        : 0
-    const suggestedRounded = Math.round(suggestedRaw)
-    const suggestedContracts = suggestedRounded > 0 ? suggestedRounded : 0
-    const suggestedCapped = Math.min(capValue, suggestedContracts)
+    const rawSuggested = profitTargetValue / tradesUntilLostValue
+    const suggested = Math.max(1, Math.round(rawSuggested))
+    const suggestedCapped = Math.min(capValue, suggested)
+    const perContractRisk = stopTicksValue * tickValue
+    const riskPerTrade = perContractRisk * suggestedCapped
 
     console.log('SUGGESTED_DEBUG', {
       profitTarget,
       tradesUntilLost,
       profitTargetValue,
       tradesUntilLostValue,
-      suggestedRaw,
-      suggestedRounded,
-      suggestedContracts,
+      rawSuggested,
+      suggested,
+      suggestedCapped,
     })
     const maxDailyProfitValue = applyConsistencyRule
       ? profitTargetValue * (consistencyRuleValue / 100)
@@ -330,6 +342,7 @@ function App() {
       product: asset,
       stopLossTicks: stopTicksValue,
       suggestedContracts: suggestedCapped,
+      suggestedContractsRaw: suggested,
       profitTarget: profitTargetValue,
       maxContractSize: maxContractSizeValue,
       tradesUntilLost: tradesUntilLostValue,
@@ -494,6 +507,11 @@ function App() {
       product: calculated.product,
       stop_loss_ticks: calculated.stopLossTicks,
       suggested_contracts: calculated.suggestedContracts,
+      suggested_contracts_raw: calculated.suggestedContractsRaw,
+      suggested_contracts_summary:
+        calculated.suggestedContractsRaw > calculated.maxContractSize
+          ? `Suggested Contracts: ${calculated.suggestedContractsRaw} (capped at ${calculated.maxContractSize} max)`
+          : `Suggested Contracts: ${calculated.suggestedContractsRaw}`,
       risk_per_trade: calculated.riskPerTrade,
       max_sl_hits_per_day: calculated.maxSlHitsPerDay ?? 0,
       daily_profit_target: calculated.dailyProfitTarget ?? 0,
