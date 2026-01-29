@@ -584,7 +584,7 @@ function App() {
 
   return (
     <div className="min-h-screen px-4 pb-16 pt-10 sm:px-6 lg:px-10">
-      <main className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-6">
+      <main className="mx-auto grid w-full grid-cols-1 gap-6 lg:max-w-[1000px]">
         <div className="text-center">
           <h1 className="title-font text-3xl text-[#1F6FFF] sm:text-4xl">
             Prop Firm Risk Calculator
