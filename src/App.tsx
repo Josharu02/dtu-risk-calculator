@@ -107,6 +107,9 @@ const SummaryCards = ({
   calculated: CalculatedOutputs
   isFinalStep: boolean
 }) => {
+  const isCapped =
+    calculated.suggestedContractsRaw > calculated.maxContractSize
+
   return (
     <div className={`text-sm ${isFinalStep ? 'space-y-3' : 'space-y-4'}`}>
       <div
@@ -122,6 +125,12 @@ const SummaryCards = ({
           <span className="font-semibold text-[#1F6FFF]">
             {calculated.suggestedContracts}
           </span>
+          {isCapped && (
+            <span className="font-semibold text-[#1F6FFF]">
+              {' '}
+              (capped at {calculated.maxContractSize} max)
+            </span>
+          )}
         </p>
         <p className="mt-2 text-sm body-text">
           Since you trade{' '}
@@ -317,12 +326,11 @@ function App() {
     }
 
     const tradesUntilLostValue = Number(tradesUntilLost)
-    const rawSuggested = profitTargetValue / tradesUntilLostValue
-    const suggested = Math.max(1, Math.round(rawSuggested))
-    const suggestedCapped = Math.min(capValue, suggested)
+    const riskPerTrade = maxLossValue / tradesUntilLostValue
     const perContractRisk = stopTicksValue * tickValue
-    const riskPerTrade = perContractRisk * suggestedCapped
-    const allowedRiskPerTrade = profitTargetValue / tradesUntilLostValue
+    const rawSuggested = riskPerTrade / perContractRisk
+    const suggested = Math.max(1, Math.floor(rawSuggested))
+    const suggestedCapped = Math.min(capValue, suggested)
 
     console.log('SUGGESTED_DEBUG', {
       profitTarget,
@@ -337,7 +345,7 @@ function App() {
       ? profitTargetValue * (consistencyRuleValue / 100)
       : 0
 
-    if (riskPerTrade > allowedRiskPerTrade) {
+    if (dailyLossCapValue > 0 && riskPerTrade > dailyLossCapValue) {
       setErrors({
         dailyLossCap:
           'This is too much risk based on your Daily Loss Limit. You can either raise the DLL or increase the amount of trades taken until account is lost.',
