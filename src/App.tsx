@@ -329,6 +329,7 @@ function App() {
     const suggestedCapped = Math.min(capValue, suggested)
     const perContractRisk = stopTicksValue * tickValue
     const riskPerTrade = perContractRisk * suggestedCapped
+    const allowedRiskPerTrade = profitTargetValue / tradesUntilLostValue
 
     console.log('SUGGESTED_DEBUG', {
       profitTarget,
@@ -343,7 +344,7 @@ function App() {
       ? profitTargetValue * (consistencyRuleValue / 100)
       : 0
 
-    if (riskPerTrade > dailyLossCapValue) {
+    if (riskPerTrade > allowedRiskPerTrade) {
       setErrors({
         dailyLossCap:
           'This is too much risk based on your Daily Loss Limit. You can either raise the DLL or increase the amount of trades taken until account is lost.',
