@@ -583,20 +583,16 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen px-4 pb-16 pt-6 sm:px-6 lg:px-10">
-      <header className="glass-panel mx-auto flex w-full max-w-6xl flex-col gap-3 rounded-2xl px-6 py-4 text-sm font-medium body-text sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-        <span className="tracking-[0.15em] body-text">
-          Day Trading University
-        </span>
-        <span className="title-font text-lg text-[#1F6FFF] sm:text-xl">
-          Prop Firm Risk Calculator
-        </span>
-        <span className="inline-flex items-center justify-center rounded-full bg-[#1F6FFF] px-3 py-1 text-xs uppercase tracking-[0.25em] text-white">
-          DTU Tool
-        </span>
-      </header>
-
-      <main className="mx-auto mt-8 grid w-full max-w-6xl grid-cols-1 gap-6">
+    <div className="min-h-screen px-4 pb-16 pt-10 sm:px-6 lg:px-10">
+      <main className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-6">
+        <div className="text-center">
+          <h1 className="title-font text-3xl text-[#1F6FFF] sm:text-4xl">
+            Prop Firm Risk Calculator
+          </h1>
+          <p className="mt-2 text-sm body-text">
+            Build a risk plan that aligns your trades with firm limits.
+          </p>
+        </div>
         <section className="glass-panel rounded-3xl p-6 sm:p-8">
           <div className="mb-6">
             <h2 className="title-font section-title text-2xl sm:text-3xl">

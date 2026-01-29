@@ -31,34 +31,7 @@ body {
   min-height: 100vh;
   font-family: 'Space Grotesk', system-ui, sans-serif;
   color: var(--ink);
-  background-color: #070a0f;
-  position: relative;
-}
-
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  /* Layer: background image */
-  background-image: url('/chart-bg.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-}
-
-body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  /* Layer: dark overlay + vignette */
-  background-image:
-    radial-gradient(circle at center, rgba(0, 0, 0, 0.1) 35%, rgba(0, 0, 0, 0.85) 100%),
-    linear-gradient(0deg, rgba(7, 10, 15, 0.76), rgba(7, 10, 15, 0.76));
+  background-color: var(--surface);
 }
 
 #root {
@@ -75,7 +48,6 @@ body::after {
   background: rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(154, 164, 178, 0.35);
   box-shadow: 0 20px 60px rgba(31, 111, 255, 0.08);
-  backdrop-filter: blur(12px);
 }
 
 @layer components {
