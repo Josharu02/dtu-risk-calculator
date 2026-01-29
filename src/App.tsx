@@ -632,10 +632,6 @@ function App() {
             <h2 className="title-font section-title text-2xl sm:text-3xl">
               Configure your risk inputs
             </h2>
-            <p className="mt-2 text-sm body-text">
-              Plug in your firm limits, pick the contract, and we will align risk
-              per trade with your stop size.
-            </p>
           </div>
 
           <div className="helper-text uppercase font-semibold tracking-[0.05em] text-[#111827]">
