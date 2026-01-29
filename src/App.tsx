@@ -589,7 +589,7 @@ function App() {
           <h1 className="title-font text-3xl text-[#1F6FFF] sm:text-4xl">
             Prop Firm Risk Calculator
           </h1>
-          <p className="mt-2 text-sm body-text">
+          <p className="mt-2 text-sm font-medium text-white">
             Build a risk plan that aligns your trades with firm limits.
           </p>
         </div>
