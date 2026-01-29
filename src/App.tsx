@@ -107,9 +107,6 @@ const SummaryCards = ({
   calculated: CalculatedOutputs
   isFinalStep: boolean
 }) => {
-  const isCapped =
-    calculated.suggestedContractsRaw > calculated.maxContractSize
-
   return (
     <div className={`text-sm ${isFinalStep ? 'space-y-3' : 'space-y-4'}`}>
       <div
@@ -125,12 +122,6 @@ const SummaryCards = ({
           <span className="font-semibold text-[#1F6FFF]">
             {calculated.suggestedContracts}
           </span>
-          {isCapped && (
-            <span className="font-semibold text-[#1F6FFF]">
-              {' '}
-              (capped at {calculated.maxContractSize} max)
-            </span>
-          )}
         </p>
         <p className="mt-2 text-sm body-text">
           Since you trade{' '}
