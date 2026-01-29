@@ -113,7 +113,7 @@ const SummaryCards = ({ calculated }: { calculated: CalculatedOutputs }) => {
         <p className="mt-2 text-sm body-text">
           Suggested Contracts:{' '}
           <span className="font-semibold text-[#1F6FFF]">
-            {calculated.suggestedContractsRaw}
+            {calculated.suggestedContracts}
           </span>
           {isCapped && (
             <span className="font-semibold text-[#1F6FFF]">
