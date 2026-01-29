@@ -341,7 +341,11 @@ function App() {
       suggested,
       suggestedCapped,
     })
-    const maxDailyProfitValue = applyConsistencyRule
+    const hasValidConsistencyRule =
+      applyConsistencyRule &&
+      Number.isFinite(consistencyRuleValue) &&
+      consistencyRuleValue > 0
+    const maxDailyProfitValue = hasValidConsistencyRule
       ? profitTargetValue * (consistencyRuleValue / 100)
       : 0
 
