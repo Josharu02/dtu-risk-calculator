@@ -584,7 +584,7 @@ function App() {
 
   return (
     <div className="min-h-screen px-4 pb-16 pt-10 sm:px-6 lg:px-10">
-      <main className="mx-auto grid w-full grid-cols-1 gap-6 lg:max-w-[1000px]">
+      <main className="mx-auto grid w-full grid-cols-1 gap-6">
         <div className="text-center">
           <h1 className="title-font text-3xl text-[#1F6FFF] sm:text-4xl">
             Prop Firm Risk Calculator
@@ -593,7 +593,8 @@ function App() {
             Build a risk plan that aligns your trades with firm limits.
           </p>
         </div>
-        <section className="glass-panel rounded-3xl p-6 sm:p-8">
+        <div className="w-full lg:mx-auto lg:max-w-[1000px]">
+          <section className="glass-panel rounded-3xl p-6 sm:p-8">
           <div className="mb-6">
             <h2 className="title-font section-title text-2xl sm:text-3xl">
               Configure your risk inputs
@@ -932,7 +933,8 @@ function App() {
               </div>
             )}
           </div>
-        </section>
+          </section>
+        </div>
       </main>
     </div>
   )
