@@ -940,39 +940,48 @@ function App() {
             </div>
           )}
 
-          <div className="mt-8 flex items-center justify-between">
-            <button
-              onClick={handleBack}
-              disabled={currentStep === 0}
-              className="inline-flex items-center justify-center rounded-full bg-[#1F6FFF] px-6 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white shadow-lg shadow-[0_20px_60px_rgba(31,111,255,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_70px_rgba(31,111,255,0.45)] disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              Back
-            </button>
-            {currentStep < 7 ? (
+          {currentStep < 7 ? (
+            <div className="mt-8 flex items-center justify-between">
+              <button
+                onClick={handleBack}
+                disabled={currentStep === 0}
+                className="inline-flex items-center justify-center whitespace-nowrap rounded-full bg-[#1F6FFF] px-6 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white shadow-lg shadow-[0_20px_60px_rgba(31,111,255,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_70px_rgba(31,111,255,0.45)] disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                Back
+              </button>
               <button
                 onClick={handleNext}
-                className="inline-flex items-center justify-center rounded-full bg-[#1F6FFF] px-8 py-3 text-sm font-semibold uppercase tracking-[0.25em] text-white shadow-lg shadow-[0_20px_60px_rgba(31,111,255,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_70px_rgba(31,111,255,0.45)]"
+                className="inline-flex items-center justify-center whitespace-nowrap rounded-full bg-[#1F6FFF] px-8 py-3 text-sm font-semibold uppercase tracking-[0.25em] text-white shadow-lg shadow-[0_20px_60px_rgba(31,111,255,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_70px_rgba(31,111,255,0.45)]"
               >
                 Next
               </button>
-            ) : (
-              <div className="flex items-center gap-3">
+            </div>
+          ) : (
+            <div className="mt-8 flex items-center justify-between max-[480px]:flex-col max-[480px]:items-stretch max-[480px]:justify-start max-[480px]:gap-3">
+              <button
+                onClick={handleBack}
+                disabled={currentStep === 0}
+                className="inline-flex items-center justify-center whitespace-nowrap rounded-full bg-[#1F6FFF] px-6 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white shadow-lg shadow-[0_20px_60px_rgba(31,111,255,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_70px_rgba(31,111,255,0.45)] disabled:cursor-not-allowed disabled:opacity-60 max-[480px]:order-2 max-[480px]:w-full"
+              >
+                Back
+              </button>
+              <div className="flex items-center gap-3 max-[480px]:contents">
                 <button
                   onClick={handleStartOver}
-                  className="inline-flex items-center justify-center rounded-full border border-[#1F6FFF] px-6 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#1F6FFF] transition hover:-translate-y-0.5 hover:shadow-[0_24px_70px_rgba(31,111,255,0.25)]"
+                  className="inline-flex items-center justify-center whitespace-nowrap rounded-full border border-[#1F6FFF] px-6 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#1F6FFF] transition hover:-translate-y-0.5 hover:shadow-[0_24px_70px_rgba(31,111,255,0.25)] max-[480px]:order-3 max-[480px]:w-full"
                 >
                   Start Over
                 </button>
                 <button
                   onClick={handleCalculate}
                   type="button"
-                  className="inline-flex items-center justify-center rounded-full bg-[#1F6FFF] px-8 py-3 text-sm font-semibold uppercase tracking-[0.25em] text-white shadow-lg shadow-[0_20px_60px_rgba(31,111,255,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_70px_rgba(31,111,255,0.45)]"
+                  className="inline-flex items-center justify-center whitespace-nowrap rounded-full bg-[#1F6FFF] px-8 py-3 text-sm font-semibold uppercase tracking-[0.25em] text-white shadow-lg shadow-[0_20px_60px_rgba(31,111,255,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_70px_rgba(31,111,255,0.45)] max-[480px]:order-1 max-[480px]:w-full"
                 >
                   CALCULATE
                 </button>
               </div>
-            )}
-          </div>
+            </div>
+          )}
           </section>
         </div>
       </main>
