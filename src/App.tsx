@@ -59,49 +59,31 @@ const TICK_VALUE_PER_TICK = {
     })
 
     const payload = {
-      full_name: fullName.trim(),
-      email: email.trim(),
-      consent: consentEmail,
-      profit_target: calculated.profitTarget,
-      max_loss_limit: calculated.maxLossLimit,
-      max_contract_size: calculated.maxContractSize,
-      daily_loss_limit: calculated.dailyLossLimit,
-      trades_until_lost: calculated.tradesUntilLost,
-      consistency_enabled: calculated.consistencyEnabled,
+      full_name: 
+      consent: cilyLossLimit,
+      trades_unti
       consistency_rule: calculated.consistencyEnabled
         ? consistencyRule.trim()
         : '',
-      product: calculated.product,
-      stop_loss_ticks: calculated.stopLossTicks,
-      suggested_contracts: calculated.suggestedContracts,
-      suggested_contracts_raw: calculated.suggestedContractsRaw,
-      suggested_contracts_summary:
-        calculated.suggestedContractsRaw > calculated.maxContractSize
-          ? `Suggested Contracts: ${calculated.suggestedContractsRaw} (capped at ${calculated.maxContractSize} max)`
-          : `Suggested Contracts: ${calculated.suggestedContractsRaw}`,
+      product: calculated.product,oss_ticks: calculated.stopLossTicks,
+      suggested_contracts: calculated.suggestedContracts,_raw: calculated.suggestedContractsRaw,
+      suggested_contract.maxContractSize
+          ? `Sug
       risk_per_trade: calculated.riskPerTrade,
-      max_sl_hits_per_day: calculated.maxSlHitsPerDay ?? 0,
-      daily_profit_target: calculated.dailyProfitTarget ?? 0,
-      max_daily_profit: calculated.consistencyEnabled
+      max_sl_hits_per_day: ca
+      daily_profit_target: 
+      max_daily_
         ? calculated.maxDailyProfit
         : 0,
     }
-
-    const requestUrl = 'https://dtu-risk-calculator-api.onrender.com/email-plan'
-    console.log('EMAIL_REQUEST_URL', requestUrl)
-    console.log('EMAIL_PAYLOAD', payload)
+ender.com/email-plan'
+    console.log
     console.log('EMAIL_START_TS', performance.now())
 
-    const controller = new AbortController()
-    const timeoutId = window.setTimeout(() => {
-      console.log('EMAIL_ABORTED_AFTER_MS', 45000)
-      controller.abort()
     }, 45000)
 
     try {
-      const response = await fetch(requestUrl, {
-        method: 'POST',
-        headers: {
+      const respon
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(payload),
