@@ -144,37 +144,7 @@ const SummaryCards = ({
   )
 }
 
-function App() {
-  const [maxContractSize, setMaxContractSize] = useState('1')
-  const [maxLoss, setMaxLoss] = useState('2500')
-  const [dailyLossCap, setDailyLossCap] = useState('')
-  const [profitTarget, setProfitTarget] = useState('')
-  const [tradesToBust, setTradesToBust] = useState('10')
-  const [asset, setAsset] = useState<AssetKey>('ES')
-  const [customTickValue, setCustomTickValue] = useState('')
-  const [stopTicks, setStopTicks] = useState('12')
-  const [applyConsistencyRule, setApplyConsistencyRule] = useState(false)
-  const [consistencyRule, setConsistencyRule] = useState('')
-  const [fullName, setFullName] = useState('')
-  const [email, setEmail] = useState('')
-  const [consentEmail, setConsentEmail] = useState(false)
-  const [errors, setErrors] = useState<Errors>({})
-  const [currentStep, setCurrentStep] = useState(0)
-  const [calculated, setCalculated] = useState<CalculatedOutputs | null>(null)
-  const [emailStatus, setEmailStatus] = useState<
-    'idle' | 'success' | 'error' | 'info'
-  >('idle')
-  const [emailError, setEmailError] = useState('')
-  const [isEmailSubmitting, setIsEmailSubmitting] = useState(false)
-  const maxContractSizeValue = Number(maxContractSize)
-  const tickValue = useMemo(() => {
-    if (asset === 'Custom') {
-      return Number(customTickValue)
-    }
-    return TICK_VALUE_PER_TICK[asset] ?? 0
-  }, [asset, customTickValue])
 
-  const markCalculatorInputsChanged = () => {
     if (Object.keys(errors).length > 0) {
       setErrors({})
     }
