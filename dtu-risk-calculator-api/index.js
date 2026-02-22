@@ -65,30 +65,7 @@ app.post('/email-plan', async (req, res) => {
       headers: {
         Authorization: `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        locationId,
-        email,
-        name: fullName,
-        customFields: toStringMap({
-          profit_target: payload.profit_target,
-          max_loss_limit: payload.max_loss_limit,
-          max_contract_size: payload.max_contract_size,
-          daily_loss_limit: payload.daily_loss_limit,
-          trades_until_lost: payload.trades_until_lost,
-          consistency_enabled: payload.consistency_enabled,
-          consistency_rule: payload.consistency_rule,
-          product: payload.product,
-          stop_loss_ticks: payload.stop_loss_ticks,
-          suggested_contracts: payload.suggested_contracts,
-          risk_per_trade: payload.risk_per_trade,
-          max_sl_hits_per_day: payload.max_sl_hits_per_day,
-          daily_profit_target: payload.daily_profit_target,
-          max_daily_profit: payload.max_daily_profit,
-        }),
-      }),
-    })
-
+   
     if (!contactResponse.ok) {
       const errorText = await contactResponse.text()
       if (contactResponse.status === 401 || contactResponse.status === 403) {
